@@ -4,4 +4,4 @@ cmake_minimum_required(VERSION 3.10)
 project(Demo)
 
 # add the executable
-add_executable(Demo demo.cxx)
+add_executable(Demo demo.cpp)
