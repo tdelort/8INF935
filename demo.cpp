@@ -1,7 +1,10 @@
 #include <iostream>
 
+#include "Vector3D.h"
+
 int main()
 {
-	std::cout << "Hello World!" << std::endl;
+	Vector3D v0;
+	std::cout << v0 << std::endl;
 	return 0;
 }
