@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
-project(Demo)
+project(Project)
 
-add_library(Vector3D STATIC Vector3D.cpp)
-add_library(Particle STATIC Particle.cpp)
-add_executable(Demo demo.cpp)
-target_link_libraries(Demo Vector3D)
-target_link_libraries(Demo Particle)
+add_executable(${PROJECT_NAME} main.cpp)
+
+#add_subdirectory(src)
+add_subdirectory(libs)
+target_link_libraries(${PROJECT_NAME} IMGUI)
+#include_directories(inc)
