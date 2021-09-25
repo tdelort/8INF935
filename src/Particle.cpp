@@ -26,6 +26,21 @@ Vector3D Particle::velocity() const
 	return m_velocity;
 }
 
+void Particle::setPosition(const Vector3D& pos)
+{
+	m_position = pos;
+}
+
+void Particle::setVelocity(const Vector3D& vel)
+{
+	m_velocity = vel;
+}
+
+void Particle::addForce(const Vector3D& force)
+{
+	m_forces.push_back(force);
+}
+
 void Particle::setMass(double val)
 {
 	if (val == 0)
