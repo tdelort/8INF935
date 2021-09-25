@@ -1,6 +1,15 @@
-# With help from : https://www.glfw.org/docs/3.3/build_guide.html#build_link_cmake_source
+#=================== GLM ====================
+# With help from : https://github.com/g-truc/glm/blob/master/manual.md#section1_5
+
+add_subdirectory(glm)
+
+#=================== GLAD ===================
+
+add_library(GLAD STATIC glad/include/glad/glad.h glad/src/glad.c)
+target_include_directories(GLAD PUBLIC glad/include)
 
 #=================== GLFW ===================
+# With help from : https://www.glfw.org/docs/3.3/build_guide.html#build_link_cmake_source
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -32,7 +41,7 @@ target_sources( IMGUI
 target_include_directories( IMGUI
                             PUBLIC ${IMGUI_DIR}
                             PUBLIC ${IMGUI_DIR}/backends
-                            PUBLIC ${GLFW_DIR}/include/GLFW
+                            # PUBLIC ${GLFW_DIR}/include/GLFW
                             )
 
 target_link_libraries(IMGUI PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS})
