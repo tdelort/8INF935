@@ -2,9 +2,8 @@
 
 Membres du Groupe :
 
-- aaa  
-- aaa  
-- aaa  
+- Alaoui, Mohamed-Wajih
+- Delort, Tristan
 
 ## Build & Run
 
