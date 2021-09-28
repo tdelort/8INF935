@@ -100,6 +100,8 @@ int main()
     GLint modelUni = glGetUniformLocation(program, "model");
     GLint viewUni = glGetUniformLocation(program, "view");
     GLint projUni = glGetUniformLocation(program, "proj");
+
+    glPointSize(5.0f);
     // ============= End Open GL init =================
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -114,7 +116,6 @@ int main()
     Particle particle;
     particle.setMass(1);
     particle.addForce(Vector3D(0, -9.81f, 0));
-    particle.setVelocity(Vector3D(2, 2, 0));
 
     double lastFrameTime;
 
@@ -141,11 +142,11 @@ int main()
             ImGui::SliderFloat("Py", &py, -1.0f, 1.0f); ImGui::SameLine();
             ImGui::SliderFloat("Pz", &pz, -1.0f, 1.0f);
 
-            ImGui::Text("Velocité Initiale");
+            ImGui::Text("Velocite Initiale");
 
-            ImGui::SliderFloat("Vx", &vx, -2.0f, 2.0f); ImGui::SameLine();
-            ImGui::SliderFloat("Vy", &vy, -2.0f, 2.0f); ImGui::SameLine();
-            ImGui::SliderFloat("Vz", &vz, -2.0f, 2.0f);
+            ImGui::SliderFloat("Vx", &vx, -3.0f, 3.0f); ImGui::SameLine();
+            ImGui::SliderFloat("Vy", &vy, -3.0f, 3.0f); ImGui::SameLine();
+            ImGui::SliderFloat("Vz", &vz, -3.0f, 3.0f);
             
             particle.setPosition(Vector3D(px, py, pz));
             particle.setVelocity(Vector3D(vx, vy, vz));

@@ -33,4 +33,3 @@ public:
 	
 	void Integrate(double deltaTime) override;
 };
-
