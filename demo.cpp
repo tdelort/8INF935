@@ -62,7 +62,7 @@ int main()
     glBindVertexArray(vao);
 
     // Putting a vertex into a buffer
-    float vertices[] = { 0.0f, 1.0f,  0.0f, 1.0f,  0.0f};
+    float vertices[] = { 0.0f,  0.0f,  0.0f };
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
