@@ -62,7 +62,7 @@ int main()
     glBindVertexArray(vao);
 
     // Putting a vertex into a buffer
-    float vertices[] = { 0.0f,  0.0f,  0.0f };
+    float vertices[] = { 0.0f, 1.0f,  0.0f, 1.0f,  0.0f};
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -94,7 +94,7 @@ int main()
     
     // Linking vertex data and attributes
     GLint positionAttrib = glGetAttribLocation(program, "position");
-    glVertexAttribPointer(positionAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(positionAttrib);
     
     GLint modelUni = glGetUniformLocation(program, "model");
