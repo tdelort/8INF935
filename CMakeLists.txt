@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 
 project(Project)
 
-add_executable(${PROJECT_NAME} demo.cpp)
+add_executable(${PROJECT_NAME} main.cpp)
 
 add_subdirectory(src)
 add_subdirectory(libs)

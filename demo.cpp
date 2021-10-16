@@ -1,5 +1,4 @@
 #define GLFW_INCLUDE_NONE
-#include "Gui.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -16,7 +15,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Gui.h"
+#include "Cube.h"
 #include "Particle.h"
+#include "Shader.h"
 
 //Vertex Shader
 const char* vertexSource = R"glsl(

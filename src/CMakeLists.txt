@@ -3,5 +3,5 @@ target_sources(${PROJECT_NAME}
 		Vector3D.cpp
 		Particle.cpp
 		Gui.cpp
+		Cube.cpp
 )
-
