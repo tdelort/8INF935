@@ -6,19 +6,18 @@
 
 #include <glm/glm.hpp>
 
-class Cube : public IDrawable
+class Grid : public IDrawable
 {
 public:
-    Cube(GLuint program);
-    ~Cube();
+    Grid();
+    ~Grid();
 
     void Draw(glm::mat4 proj, glm::mat4 view) const override;
 
-    glm::mat4 GetTransform() const;
-    void SetTransform(glm::mat4 transform);
+    void SetSize(float size);
 
 private:
-    glm::mat4 m_transform;
+    float m_size;
 
     GLuint m_vao;
     GLuint m_vertexVbo, m_colorsVbo, m_facesVbo;
@@ -26,5 +25,8 @@ private:
 
     GLuint m_program;
 
-    GLint m_modelUni, m_viewUni, m_projUni;
+    GLint m_sizeUni, m_viewUni, m_projUni;
+
+    //"small" helper function
+    GLuint CreateProgram() const;
 };

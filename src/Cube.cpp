@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Cube::Cube(GLuint program)
+    : m_program(program), m_transform(glm::mat4(1.0f))
 {
     /** front  back
      *   3 2   7 6
@@ -78,8 +79,6 @@ Cube::Cube(GLuint program)
     m_modelUni = glGetUniformLocation(program, "model");
     m_viewUni = glGetUniformLocation(program, "view");
     m_projUni = glGetUniformLocation(program, "proj");
-
-    m_transform = glm::mat4(1.0f);
 }
 
 Cube::~Cube()
@@ -87,7 +86,7 @@ Cube::~Cube()
 
 }
 
-void Cube::Draw(glm::mat4 proj, glm::mat4 view)
+void Cube::Draw(glm::mat4 proj, glm::mat4 view) const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
@@ -95,4 +94,14 @@ void Cube::Draw(glm::mat4 proj, glm::mat4 view)
     glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+}
+
+glm::mat4 Cube::GetTransform() const
+{
+    return m_transform;
+}
+
+void Cube::SetTransform(glm::mat4 transform)
+{
+    m_transform = transform;
 }

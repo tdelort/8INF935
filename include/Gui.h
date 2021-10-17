@@ -24,7 +24,7 @@ public:
 	void pollEvents();
 	void clear(ImVec4 clear_color);
 	void swapBuffers();
-
+	GLFWwindow* GetWindow() const;
 	~Gui();
 	
 	const char * glsl_version;

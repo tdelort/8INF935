@@ -53,7 +53,7 @@ Gui::Gui()
 #endif
 
     // Create window with graphics context
-    m_window = glfwCreateWindow(1080, 1080, "ImGUI + GLFW + OpenGL3", NULL, NULL);
+    m_window = glfwCreateWindow(720, 720, "ImGUI + GLFW + OpenGL3", NULL, NULL);
     if (m_window == NULL)
         exit(1);
     glfwMakeContextCurrent(m_window);
@@ -81,6 +81,10 @@ Gui::Gui()
     }
 
     glEnable(GL_DEPTH_TEST);
+    // Enable blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_MULTISAMPLE);
 }
 
 bool Gui::isOpen()
@@ -95,6 +99,9 @@ void Gui::pollEvents()
 
 void Gui::clear(ImVec4 clear_color)
 {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
     ImGui::Render();
     int display_w, display_h;
     glfwGetFramebufferSize(m_window, &display_w, &display_h);
@@ -109,6 +116,10 @@ void Gui::swapBuffers()
 	glfwSwapBuffers(m_window);
 }
 
+GLFWwindow* Gui::GetWindow() const
+{
+    return m_window;
+}
 
 Gui::~Gui()
 {

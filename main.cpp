@@ -14,11 +14,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <iostream>
 
 #include "Gui.h"
 #include "Cube.h"
+#include "Grid.h"
 
 //Vertex Shader
 const char* vertexSource = R"glsl(
@@ -54,11 +56,8 @@ const char* fragmentSource = R"glsl(
 	}
 )glsl";
 
-int main()
+GLuint createProgram()
 {
-	Gui gui;
-    ImVec4 clear_color = ImVec4(0, 0, 0, 1);
-
     // Creating Vertex shader
     GLint status;
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -82,30 +81,41 @@ int main()
     glAttachShader(program, fragmentShader);
     glLinkProgram(program);
     glUseProgram(program);
+    return program;
+}
 
+int main()
+{
+	Gui gui;
+    ImVec4 clear_color = ImVec4(0, 0, 0, 1);
+
+    GLuint program = createProgram();
 
     Cube cube(program);
 
-    float startTime = glfwGetTime();
+    Grid grid;
+
+    double startTime = glfwGetTime();
 	while (gui.isOpen())
 	{
         gui.pollEvents();
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         gui.clear(clear_color);
+
         double time = glfwGetTime() - startTime;
-        time /= 4.0;
+        time /= 1.0;
         glm::mat4 view = glm::lookAt(
-            glm::vec3(2 * std::cos(time), 0.0f, 2 * std::sin(time)),
+            glm::vec3(5 * std::cos(time), 1.0f, 5 * std::sin(time)),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         );
-        glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1.0f, 1.0f, 10.0f);
+
+        //std::cout << glm::to_string(view) << std::endl;
+        int width, height;
+        glfwGetWindowSize(gui.GetWindow(), &width, &height);
+        glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
 
         cube.Draw(proj, view);
+        grid.Draw(proj, view);
         gui.swapBuffers();
 	}
     

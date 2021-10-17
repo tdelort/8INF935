@@ -84,7 +84,7 @@ Vector3D Vector3D::cross(const Vector3D& other) const
 
 
 
-Vector3D Vector3D::operator-()
+Vector3D Vector3D::operator-() const
 {
 	return Vector3D(-m_x, -m_y, -m_z);
 }
@@ -134,33 +134,33 @@ Vector3D& Vector3D::operator/=(double rhs)
 	return *this *= (1.0 / rhs);
 }
 
-Vector3D Vector3D::operator+(const Vector3D& rhs)
+Vector3D Vector3D::operator+(const Vector3D& rhs) const
 {
 	return Vector3D(*this) += rhs;
 }
 
-Vector3D Vector3D::operator-(const Vector3D& rhs)
+Vector3D Vector3D::operator-(const Vector3D& rhs) const
 {
 	return Vector3D(*this) -= rhs;
 }
 
 
-Vector3D Vector3D::operator+(double rhs)
+Vector3D Vector3D::operator+(double rhs) const
 {
 	return Vector3D(*this) += rhs;
 }
 
-Vector3D Vector3D::operator-(double rhs)
+Vector3D Vector3D::operator-(double rhs) const
 {
 	return Vector3D(*this) -= rhs;
 }
 
-Vector3D Vector3D::operator*(double rhs)
+Vector3D Vector3D::operator*(double rhs) const
 {
 	return Vector3D(*this) *= rhs;
 }
 
-Vector3D Vector3D::operator/(double rhs)
+Vector3D Vector3D::operator/(double rhs) const
 {
 	if (rhs == 0)
 	{ 
@@ -170,12 +170,12 @@ Vector3D Vector3D::operator/(double rhs)
 	return Vector3D(*this) /= rhs;
 }
 
-bool Vector3D::operator==(const Vector3D& other)
+bool Vector3D::operator==(const Vector3D& other) const
 {
 	return m_x == other.m_x && m_y == other.m_y && m_z == other.m_z;
 }
 
-bool Vector3D::operator!=(const Vector3D& other)
+bool Vector3D::operator!=(const Vector3D& other) const
 {
 	return !(*this == other);
 }

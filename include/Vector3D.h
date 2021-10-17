@@ -31,7 +31,7 @@ public:
 	double dot(const Vector3D& other) const;
 	Vector3D cross(const Vector3D& other) const;
 	
-	Vector3D operator-();
+	Vector3D operator-() const;
 	Vector3D& operator+=(const Vector3D& rhs);
 	Vector3D& operator-=(const Vector3D& rhs);
 
@@ -40,16 +40,16 @@ public:
 	Vector3D& operator*=(double rhs);
 	Vector3D& operator/=(double rhs);
 	
-	Vector3D operator+(const Vector3D& rhs);
-	Vector3D operator-(const Vector3D& rhs);
-	Vector3D operator+(double rhs);
-	Vector3D operator-(double rhs);
+	Vector3D operator+(const Vector3D& rhs) const;
+	Vector3D operator-(const Vector3D& rhs) const;
+	Vector3D operator+(double rhs) const;
+	Vector3D operator-(double rhs) const;
 
-	Vector3D operator*(double rhs);
-	Vector3D operator/(double rhs);
+	Vector3D operator*(double rhs) const;
+	Vector3D operator/(double rhs) const;
 
-	bool operator==(const Vector3D& other);
-	bool operator!=(const Vector3D& other);
+	bool operator==(const Vector3D& other) const;
+	bool operator!=(const Vector3D& other) const;
 
 	friend Vector3D operator*(double lhs, const Vector3D& rhs);
 	friend std::ostream& operator<<(std::ostream& stream, const Vector3D& v);

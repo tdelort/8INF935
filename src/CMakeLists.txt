@@ -4,4 +4,6 @@ target_sources(${PROJECT_NAME}
 		Particle.cpp
 		Gui.cpp
 		Cube.cpp
+		Camera.cpp
+		Grid.cpp
 )

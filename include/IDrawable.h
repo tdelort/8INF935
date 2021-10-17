@@ -4,5 +4,5 @@
 
 class IDrawable {
 public:
-    virtual void Draw(glm::mat4 proj, glm::mat4 view) = 0;
+    virtual void Draw(glm::mat4 proj, glm::mat4 view) const = 0;
 };
