@@ -127,11 +127,6 @@ int main()
 	{
         gui.pollEvents();
 
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         switch (appState)
         {
         case State::SET:

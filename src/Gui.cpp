@@ -99,9 +99,6 @@ void Gui::pollEvents()
 
 void Gui::clear(ImVec4 clear_color)
 {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
     ImGui::Render();
     int display_w, display_h;
     glfwGetFramebufferSize(m_window, &display_w, &display_h);

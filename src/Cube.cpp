@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Cube::Cube(GLuint program)
-    : m_program(program), m_transform(glm::mat4(1.0f))
+    : m_program(program), m_T(1.0f), m_R(1.0f), m_S(1.0f)
 {
     /** front  back
      *   3 2   7 6
@@ -90,18 +90,27 @@ void Cube::Draw(glm::mat4 proj, glm::mat4 view) const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
-    glUniformMatrix4fv(m_modelUni, 1, GL_FALSE, glm::value_ptr(m_transform));
+    glm::mat4 trans = m_T * m_S * m_R;
+    glUniformMatrix4fv(m_modelUni, 1, GL_FALSE, glm::value_ptr(trans));
     glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
-glm::mat4 Cube::GetTransform() const
+void Cube::SetPosition(const glm::vec3& position)
 {
-    return m_transform;
+    m_T = glm::translate(glm::mat4(1.0f), position);
 }
 
-void Cube::SetTransform(glm::mat4 transform)
+void Cube::SetRotation(const glm::vec3& position)
 {
-    m_transform = transform;
+    glm::mat4 rX = glm::rotate(glm::mat4(1.0f), position.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 rY = glm::rotate(glm::mat4(1.0f), position.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rZ = glm::rotate(glm::mat4(1.0f), position.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    m_R = rZ * rY * rX;
+}
+
+void Cube::SetScale(const glm::vec3& scale)
+{
+    m_S = glm::scale(glm::mat4(1.0f), scale);
 }

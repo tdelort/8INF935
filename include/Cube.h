@@ -14,11 +14,14 @@ public:
 
     void Draw(glm::mat4 proj, glm::mat4 view) const override;
 
-    glm::mat4 GetTransform() const;
-    void SetTransform(glm::mat4 transform);
+    void SetPosition(const glm::vec3& position);
+    void SetRotation(const glm::vec3& rotation);
+    void SetScale(const glm::vec3& scale);
 
 private:
-    glm::mat4 m_transform;
+    glm::mat4 m_T;
+    glm::mat4 m_R;
+    glm::mat4 m_S;
 
     GLuint m_vao;
     GLuint m_vertexVbo, m_colorsVbo, m_facesVbo;

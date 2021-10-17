@@ -21,6 +21,7 @@
 #include "Gui.h"
 #include "Cube.h"
 #include "Grid.h"
+#include "Particle.h"
 
 //Vertex Shader
 const char* vertexSource = R"glsl(
@@ -84,6 +85,11 @@ GLuint createProgram()
     return program;
 }
 
+enum class State {
+    SET,
+    PLAY
+};
+
 int main()
 {
 	Gui gui;
@@ -92,27 +98,91 @@ int main()
     GLuint program = createProgram();
 
     Cube cube(program);
+    cube.SetScale(glm::vec3(0.1f));
 
     Grid grid;
 
-    double startTime = glfwGetTime();
+    State appState = State::SET;
+    Particle particle;
+    particle.setMass(1);
+    particle.addForce(Vector3D(0, -9.81f, 0));
+
+    double lastFrameTime;
+
+	float px, py, pz, vx, vy, vz;
+	px = py = pz = vx = vy = vz = 0;
 	while (gui.isOpen())
 	{
         gui.pollEvents();
-        gui.clear(clear_color);
 
-        double time = glfwGetTime() - startTime;
-        time /= 1.0;
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+
+        switch (appState)
+        {
+        case State::SET:
+        {
+            ImGui::Begin("Config", 0, ImGuiWindowFlags_AlwaysAutoResize);
+
+            ImGui::Text("Position Initiale");
+
+            ImGui::SliderFloat("Px", &px, -5.0f, 5.0f); ImGui::SameLine();
+            ImGui::SliderFloat("Py", &py, -5.0f, 5.0f); ImGui::SameLine();
+            ImGui::SliderFloat("Pz", &pz, -5.0f, 5.0f);
+
+            ImGui::Text("Velocite Initiale");
+
+            ImGui::SliderFloat("Vx", &vx, -5.0f, 5.0f); ImGui::SameLine();
+            ImGui::SliderFloat("Vy", &vy, -5.0f, 5.0f); ImGui::SameLine();
+            ImGui::SliderFloat("Vz", &vz, -5.0f, 5.0f);
+            
+            particle.setPosition(Vector3D(px, py, pz));
+            particle.setVelocity(Vector3D(vx, vy, vz));
+
+            if (ImGui::Button("Start"))
+            {
+                appState = State::PLAY;
+                lastFrameTime = glfwGetTime();
+            }
+            ImGui::End();
+            break;
+        }
+        case State::PLAY:
+        {
+            ImGui::Begin("Controls", 0, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Text("Press Stop to stop the simulation");
+            if (ImGui::Button("Stop"))
+            {
+                appState = State::SET;
+            }
+            ImGui::End();
+
+            // Computation on Particle
+            double deltaTime = glfwGetTime() - lastFrameTime;
+            lastFrameTime = glfwGetTime();
+
+            particle.Integrate(deltaTime);
+            break;
+        }
+        default:
+            break;
+        }
+        
+
+        gui.clear(clear_color);
         glm::mat4 view = glm::lookAt(
-            glm::vec3(5 * std::cos(time), 1.0f, 5 * std::sin(time)),
+            glm::vec3(5.0f, 1.0f, 5.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         );
 
-        //std::cout << glm::to_string(view) << std::endl;
         int width, height;
         glfwGetWindowSize(gui.GetWindow(), &width, &height);
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
+
+		cube.SetPosition(glm::vec3(particle.position().x(), particle.position().y(), particle.position().z()));
 
         cube.Draw(proj, view);
         grid.Draw(proj, view);

@@ -42,7 +42,7 @@ GLuint Grid::CreateProgram() const
 
         void main()
         {
-            float thickness = 0.002f;
+            float thickness = 0.005f;
             float large_thickness = 5 * thickness;
             float alpha = fract(ex_pos.x) < thickness || fract(ex_pos.z) < thickness ? 0.5f : 0.0f;
             alpha = fract((5 + ex_pos.x) / 5) < large_thickness / 5 || fract((5 + ex_pos.z) / 5) < large_thickness / 5 ? 1.0f : alpha;
