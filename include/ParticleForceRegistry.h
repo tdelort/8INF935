@@ -19,7 +19,5 @@ private:
 
 public:
 
-    //... Registry Accessors
-
     void UpdateForce(float duration);
 };

@@ -13,4 +13,5 @@ private:
 public:
     void UpdateForce (Particle* particle, float duration);
 // apply simplified drag based on particle's velocity 
+// F = - P (m_k1 * norme(p) + m_k2 * norme(p)^2)
 };
