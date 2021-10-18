@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Cube::Cube(GLuint program)
-    : m_program(program), m_T(1.0f), m_R(1.0f), m_S(1.0f)
+    : m_program(program), m_T(1.0f), m_R(1.0f), m_S(1.0f), m_albedo(1.0f)
 {
     /** front  back
      *   3 2   7 6
@@ -79,6 +79,7 @@ Cube::Cube(GLuint program)
     m_modelUni = glGetUniformLocation(program, "model");
     m_viewUni = glGetUniformLocation(program, "view");
     m_projUni = glGetUniformLocation(program, "proj");
+    m_albedoUni = glGetUniformLocation(program, "albedo");
 }
 
 Cube::~Cube()
@@ -94,6 +95,7 @@ void Cube::Draw(glm::mat4 proj, glm::mat4 view) const
     glUniformMatrix4fv(m_modelUni, 1, GL_FALSE, glm::value_ptr(trans));
     glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));
+    glUniform3fv(m_albedoUni, 1, glm::value_ptr(m_albedo));
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }
 
@@ -113,4 +115,9 @@ void Cube::SetRotation(const glm::vec3& position)
 void Cube::SetScale(const glm::vec3& scale)
 {
     m_S = glm::scale(glm::mat4(1.0f), scale);
+}
+
+void Cube::SetColor(const glm::vec3& rgb)
+{
+    m_albedo = rgb;
 }

@@ -35,10 +35,12 @@ const char* vertexSource = R"glsl(
 	uniform mat4 model;
 	uniform mat4 view;
 	uniform mat4 proj;
+    uniform vec3 albedo;
 
 	void main()
 	{
-        Color = color;
+        //Color = color;
+        Color = albedo;
 		gl_Position = proj * view * model * vec4(position, 1.0);
 	}
 )glsl";
@@ -99,6 +101,7 @@ int main()
 
     Cube cube(program);
     cube.SetScale(glm::vec3(0.1f));
+    cube.SetColor(glm::vec3(1.0, 0.7, 0.6));
 
     Grid grid;
 

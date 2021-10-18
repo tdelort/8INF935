@@ -17,8 +17,10 @@ public:
     void SetPosition(const glm::vec3& position);
     void SetRotation(const glm::vec3& rotation);
     void SetScale(const glm::vec3& scale);
+    void SetColor(const glm::vec3& rgb);
 
 private:
+    glm::vec3 m_albedo;
     glm::mat4 m_T;
     glm::mat4 m_R;
     glm::mat4 m_S;
@@ -29,5 +31,5 @@ private:
 
     GLuint m_program;
 
-    GLint m_modelUni, m_viewUni, m_projUni;
+    GLint m_modelUni, m_viewUni, m_projUni, m_albedoUni;
 };
