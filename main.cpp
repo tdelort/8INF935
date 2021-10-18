@@ -101,7 +101,7 @@ int main()
 
     Cube cube(program);
     cube.SetScale(glm::vec3(0.1f));
-    cube.SetColor(glm::vec3(1.0, 0.7, 0.6));
+    cube.SetColor(glm::vec3(0.0, 0.7, 0.6));
 
     Grid grid;
 

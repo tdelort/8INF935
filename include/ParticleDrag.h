@@ -13,4 +13,4 @@ private:
 public:
     void UpdateForce (Particle* particle, float duration);
 // apply simplified drag based on particle's velocity 
-}
+};
