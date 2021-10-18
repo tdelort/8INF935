@@ -4,6 +4,7 @@ Membres du Groupe :
 
 - Alaoui, Mohamed-Wajih
 - Delort, Tristan
+- Miras, Lucas
 
 ## Build & Run
 
