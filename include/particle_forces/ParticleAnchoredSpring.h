@@ -5,7 +5,6 @@
 
 class ParticleAnchoredSpring : public ParticleForceGenerator
 {
-
 private:
     //other anchor
     Vector3D m_anchor; 
@@ -15,5 +14,8 @@ private:
     float m_restLength;
 
 public:
-    void UpdateForce(Particle* particle, float duration);
+    void UpdateForce(Particle* particle, float duration) override;
+    void SetK(float k);
+    void SetRestLength(float restLength);
+    void SetAnchor(const Vector3D& anchor);
 };

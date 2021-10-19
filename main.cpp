@@ -22,6 +22,8 @@
 #include <Cube.h>
 #include <Grid.h>
 #include <Particle.h>
+#include <particle_forces/ParticleAnchoredSpring.h>
+#include <particle_forces/ParticleGravity.h>
 
 //Vertex Shader
 const char* vertexSource = R"glsl(
@@ -106,9 +108,17 @@ int main()
     Grid grid;
 
     State appState = State::SET;
+
     Particle particle;
     particle.setMass(1);
-    particle.addForce(Vector3D(0, -9.81f, 0));
+    
+    ParticleAnchoredSpring pas;
+    pas.SetK(10.0f);
+    pas.SetRestLength(1.0f);
+    pas.SetAnchor(Vector3D(0.0, 1.0, 0.0));
+
+    ParticleGravity pg;
+    pg.SetGravity(Vector3D(0.0, -9.81, 0.0));
 
     double lastFrameTime;
 
@@ -165,6 +175,10 @@ int main()
             // Computation on Particle
             double deltaTime = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
+
+            particle.clearForces();
+            pas.UpdateForce(&particle, (float)deltaTime);
+            pg.UpdateForce(&particle, (float)deltaTime);
 
             particle.Integrate(deltaTime);
             break;

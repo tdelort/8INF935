@@ -41,6 +41,11 @@ void Particle::addForce(const Vector3D& force)
 	m_forces.push_back(force);
 }
 
+void Particle::clearForces()
+{
+	m_forces.clear();
+}
+
 void Particle::setMass(double val)
 {
 	if (val == 0)

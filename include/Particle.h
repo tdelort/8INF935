@@ -27,6 +27,7 @@ public:
 	void setPosition(const Vector3D& pos);
 	void setVelocity(const Vector3D& vel);
 	void addForce(const Vector3D& force);
+	void clearForces();
 
 	void setMass(double val);
 	void setInvMass(double val);
