@@ -3,7 +3,7 @@ class ParticleAnchoredSpring : public ParticleForceGenerator
 
 private:
     //other anchor
-    Vectorr3 m_anchor; 
+    Vector3 m_anchor; 
 
     //Spring constant
     float m_k;
