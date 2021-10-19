@@ -11,7 +11,7 @@ class ParticleGravity: public ParticleForceGenerator
     Vector3D m_gravity;
 
 public:
-    // F = particle->GetMass()*m_gravity
+    ParticleGravity(Vector3D gravity);
     void UpdateForce (Particle* particle, float duration);
     void SetGravity(const Vector3D& gravity);
 };

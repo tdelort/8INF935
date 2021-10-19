@@ -14,6 +14,8 @@ private:
     float m_restLength;
 
 public:
+    ParticleAnchoredSpring(float k, float restLength, const Vector3D& anchor);
+
     void UpdateForce(Particle* particle, float duration) override;
     void SetK(float k);
     void SetRestLength(float restLength);

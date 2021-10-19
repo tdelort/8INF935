@@ -1,6 +1,10 @@
 #include "particle_forces/ParticleDrag.h"
 #include "Particle.h"
 
+ParticleDrag::ParticleDrag(float k1, float k2)
+    : m_k1(k1), m_k2(k2)
+{}
+
 void ParticleDrag::UpdateForce (Particle* particle, float duration)
 {
     Vector3D v = particle->velocity();

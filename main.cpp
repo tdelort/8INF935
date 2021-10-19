@@ -22,9 +22,11 @@
 #include <Cube.h>
 #include <Grid.h>
 #include <Particle.h>
+
 #include <particle_forces/ParticleAnchoredSpring.h>
 #include <particle_forces/ParticleGravity.h>
 #include <particle_forces/ParticleDrag.h>
+#include <particle_forces/ParticleForceRegistry.h>
 
 //Vertex Shader
 const char* vertexSource = R"glsl(
@@ -106,41 +108,19 @@ int main()
     cube.SetScale(glm::vec3(0.1f));
     cube.SetColor(glm::vec3(0.0, 0.7, 0.6));
 
-    Cube cube2(program);
-    cube2.SetScale(glm::vec3(0.1f));
-    cube2.SetColor(glm::vec3(0.0, 0.7, 0.6));
-
     Grid grid;
 
     State appState = State::SET;
 
+    ParticleForceRegistry reg;
+
     Particle particle1;
     particle1.setMass(1);
-    
-    Particle particle2;
-    particle2.setMass(1);
-    particle2.setPosition(Vector3D(1.0, 0.0, 0.0));
 
-    ParticleAnchoredSpring pas;
-    pas.SetK(10.0f);
-    pas.SetRestLength(1.0f);
-    pas.SetAnchor(Vector3D(0.0, 1.0, 0.0));
-
-    ParticleAnchoredSpring pas2;
-    pas2.SetK(10.0f);
-    pas2.SetRestLength(1.0f);
-    pas2.SetAnchor(Vector3D(1.0, 1.0, 0.0));
-
-    ParticleGravity pg;
-    pg.SetGravity(Vector3D(0.0, -9.81, 0.0));
-
-    ParticleDrag pd1;
-    pd1.SetK1(0.1f);
-    pd1.SetK2(0.01f);
-
-    ParticleDrag pd2;
-    pd2.SetK1(0.2f);
-    pd2.SetK2(0.02f);
+    ParticleAnchoredSpring(10.0f, 1.0f, Vector3D(0.0, 1.0, 0.0));
+    reg.AddEntry(&particle1, &ParticleAnchoredSpring(10.0f, 1.0f, Vector3D(0.0, 1.0, 0.0)));
+    reg.AddEntry(&particle1, &ParticleGravity(Vector3D(0.0, -9.81, 0.0)));
+    reg.AddEntry(&particle1, &ParticleDrag(0.1f, 0.01f));
 
     double lastFrameTime;
 
@@ -198,18 +178,9 @@ int main()
             double deltaTime = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
 
-            particle1.clearForces();
-            pas.UpdateForce(&particle1, (float)deltaTime);
-            pg.UpdateForce(&particle1, (float)deltaTime);
-            pd1.UpdateForce(&particle1, (float)deltaTime);
-
-            particle2.clearForces();
-            pas2.UpdateForce(&particle2, (float)deltaTime);
-            pg.UpdateForce(&particle2, (float)deltaTime);
-            pd2.UpdateForce(&particle2, (float)deltaTime);
+            reg.UpdateForce(deltaTime);
 
             particle1.Integrate(deltaTime);
-            particle2.Integrate(deltaTime);
             break;
         }
         default:
@@ -229,10 +200,8 @@ int main()
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
 
 		cube.SetPosition(glm::vec3(particle1.position().x(), particle1.position().y(), particle1.position().z()));
-		cube2.SetPosition(glm::vec3(particle2.position().x(), particle2.position().y(), particle2.position().z()));
 
         cube.Draw(proj, view);
-        cube2.Draw(proj, view);
         grid.Draw(proj, view);
         gui.swapBuffers();
 	}

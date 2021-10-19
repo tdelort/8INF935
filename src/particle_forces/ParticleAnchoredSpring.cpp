@@ -2,6 +2,10 @@
 #include "particle_forces/ParticleAnchoredSpring.h"
 #include "Vector3D.h"
 
+ParticleAnchoredSpring::ParticleAnchoredSpring(float k, float restLength, const Vector3D& anchor)
+    : m_k(k), m_restLength(restLength), m_anchor(anchor)
+{}
+
 void ParticleAnchoredSpring::UpdateForce(Particle* particle, float duration)
 {
     Vector3D d = particle->position() - m_anchor;

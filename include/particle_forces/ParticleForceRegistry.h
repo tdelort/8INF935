@@ -22,4 +22,5 @@ private:
 public:
 
     void UpdateForce(float duration);
+    void AddEntry(Particle* particle, ParticleForceGenerator* generator);
 };
