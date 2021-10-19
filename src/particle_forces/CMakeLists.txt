@@ -1,0 +1,11 @@
+target_sources(${PROJECT_NAME}
+	PRIVATE
+		ParticleAnchoredSpring.cpp
+		ParticleAnchoredSpring.cpp
+		ParticleBungeeSpring.cpp
+		ParticleBuoyancy.cpp
+		ParticleDrag.cpp
+		ParticleForceRegistry.cpp
+		ParticleGravity.cpp
+		ParticleSpring.cpp
+)
