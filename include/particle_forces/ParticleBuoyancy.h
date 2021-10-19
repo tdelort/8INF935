@@ -1,3 +1,9 @@
+#pragma once
+
+#include "ParticleForceGenerator.h"
+
+class Particle;
+
 class ParticleBuoyancy : public ParticleForceGenerator
 {
 private:

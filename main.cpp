@@ -1,8 +1,8 @@
 #define GLFW_INCLUDE_NONE
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #include <glad/glad.h>
 
@@ -18,10 +18,10 @@
 
 #include <iostream>
 
-#include "Gui.h"
-#include "Cube.h"
-#include "Grid.h"
-#include "Particle.h"
+#include <Gui.h>
+#include <Cube.h>
+#include <Grid.h>
+#include <Particle.h>
 
 //Vertex Shader
 const char* vertexSource = R"glsl(

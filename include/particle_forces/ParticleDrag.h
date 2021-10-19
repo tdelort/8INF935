@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Particle.h"
 #include "ParticleForceGenerator.h"
-#include "Vector3D.h"
+
+class Particle;
 
 class ParticleDrag: public ParticleForceGenerator
 {

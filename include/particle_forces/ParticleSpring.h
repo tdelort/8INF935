@@ -1,4 +1,10 @@
-class ParticleBungeeSpring : public ParticleForceGenerator
+#pragma once
+
+#include "ParticleForceGenerator.h"
+
+class Particle;
+
+class ParticleSpring : public ParticleForceGenerator
 {
 private:
     //other anchor
@@ -8,7 +14,6 @@ private:
     float m_k;
 
     float m_restLength;
-    // Calcul uniquement lorsque la distance entre les deux encrages est > à m_restLength
 
 public:
 
