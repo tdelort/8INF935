@@ -24,6 +24,7 @@
 #include <Particle.h>
 #include <particle_forces/ParticleAnchoredSpring.h>
 #include <particle_forces/ParticleGravity.h>
+#include <particle_forces/ParticleDrag.h>
 
 //Vertex Shader
 const char* vertexSource = R"glsl(
@@ -105,20 +106,41 @@ int main()
     cube.SetScale(glm::vec3(0.1f));
     cube.SetColor(glm::vec3(0.0, 0.7, 0.6));
 
+    Cube cube2(program);
+    cube2.SetScale(glm::vec3(0.1f));
+    cube2.SetColor(glm::vec3(0.0, 0.7, 0.6));
+
     Grid grid;
 
     State appState = State::SET;
 
-    Particle particle;
-    particle.setMass(1);
+    Particle particle1;
+    particle1.setMass(1);
     
+    Particle particle2;
+    particle2.setMass(1);
+    particle2.setPosition(Vector3D(1.0, 0.0, 0.0));
+
     ParticleAnchoredSpring pas;
     pas.SetK(10.0f);
     pas.SetRestLength(1.0f);
     pas.SetAnchor(Vector3D(0.0, 1.0, 0.0));
 
+    ParticleAnchoredSpring pas2;
+    pas2.SetK(10.0f);
+    pas2.SetRestLength(1.0f);
+    pas2.SetAnchor(Vector3D(1.0, 1.0, 0.0));
+
     ParticleGravity pg;
     pg.SetGravity(Vector3D(0.0, -9.81, 0.0));
+
+    ParticleDrag pd1;
+    pd1.SetK1(0.1f);
+    pd1.SetK2(0.01f);
+
+    ParticleDrag pd2;
+    pd2.SetK1(0.2f);
+    pd2.SetK2(0.02f);
 
     double lastFrameTime;
 
@@ -151,8 +173,8 @@ int main()
             ImGui::SliderFloat("Vy", &vy, -5.0f, 5.0f); ImGui::SameLine();
             ImGui::SliderFloat("Vz", &vz, -5.0f, 5.0f);
             
-            particle.setPosition(Vector3D(px, py, pz));
-            particle.setVelocity(Vector3D(vx, vy, vz));
+            particle1.setPosition(Vector3D(px, py, pz));
+            particle1.setVelocity(Vector3D(vx, vy, vz));
 
             if (ImGui::Button("Start"))
             {
@@ -176,11 +198,18 @@ int main()
             double deltaTime = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
 
-            particle.clearForces();
-            pas.UpdateForce(&particle, (float)deltaTime);
-            pg.UpdateForce(&particle, (float)deltaTime);
+            particle1.clearForces();
+            pas.UpdateForce(&particle1, (float)deltaTime);
+            pg.UpdateForce(&particle1, (float)deltaTime);
+            pd1.UpdateForce(&particle1, (float)deltaTime);
 
-            particle.Integrate(deltaTime);
+            particle2.clearForces();
+            pas2.UpdateForce(&particle2, (float)deltaTime);
+            pg.UpdateForce(&particle2, (float)deltaTime);
+            pd2.UpdateForce(&particle2, (float)deltaTime);
+
+            particle1.Integrate(deltaTime);
+            particle2.Integrate(deltaTime);
             break;
         }
         default:
@@ -199,9 +228,11 @@ int main()
         glfwGetWindowSize(gui.GetWindow(), &width, &height);
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
 
-		cube.SetPosition(glm::vec3(particle.position().x(), particle.position().y(), particle.position().z()));
+		cube.SetPosition(glm::vec3(particle1.position().x(), particle1.position().y(), particle1.position().z()));
+		cube2.SetPosition(glm::vec3(particle2.position().x(), particle2.position().y(), particle2.position().z()));
 
         cube.Draw(proj, view);
+        cube2.Draw(proj, view);
         grid.Draw(proj, view);
         gui.swapBuffers();
 	}
