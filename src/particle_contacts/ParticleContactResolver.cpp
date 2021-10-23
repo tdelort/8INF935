@@ -3,12 +3,12 @@
 
 void ParticleContactResolver::resolveContacts(std::vector<ParticleContact*>* contacts, float duration)
 {
-	//On résoud le contact avec la plus petite velocité relative en premier 
+	//On rï¿½soud le contact avec la plus petite velocitï¿½ relative en premier 
 	if (contacts->empty())
 		return;
 	float sRelativeVelocity = contacts[0]->calculateSeparatingVelocity();
 	int iContact = 0, nbIteration = 0;
-	while (nbIteration < 2) { //deux itérations de la liste possible
+	while (nbIteration < 2) { //deux itï¿½rations de la liste possible
 		for (int i = 0; i < contacts.size(); i++)
 		{
 			float iRelativeVelocity = contacts[i]->calculateSeparatingVelocity()
