@@ -14,11 +14,9 @@ public:
 
     void Draw(glm::mat4 proj, glm::mat4 view) const override;
 
-    void SetSize(float size);
-
     //"small" helper function
     static GLuint CreateProgram();
 private:
-    float m_size;
+    static const int size = 50;
     GLint m_sizeUni, m_viewUni, m_projUni;
 };

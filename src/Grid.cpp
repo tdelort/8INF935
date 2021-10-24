@@ -4,7 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
-
+#include <array>
 
 GLuint Grid::CreateProgram()
 {
@@ -15,7 +15,6 @@ GLuint Grid::CreateProgram()
         in vec3 position;
         in vec3 color;
 
-        uniform float size;
         uniform mat4 view;
         uniform mat4 proj;
 
@@ -25,9 +24,8 @@ GLuint Grid::CreateProgram()
         void main()
         {
             Color = color;
-            vec4 out_pos = proj * view * vec4(size * position, 1.0f);
-            gl_Position = out_pos;
-            ex_pos = position * size;
+            gl_Position = proj * view * vec4(position, 1.0);
+            ex_pos = position;
         }
     )glsl";
 
@@ -42,20 +40,13 @@ GLuint Grid::CreateProgram()
 
         void main()
         {
-            float thickness = 0.005f;
-            float large_thickness = 5 * thickness;
-            float alpha = fract(ex_pos.x) < thickness || fract(ex_pos.z) < thickness ? 0.5f : 0.0f;
-            alpha = fract((5 + ex_pos.x) / 5) < large_thickness / 5 || fract((5 + ex_pos.z) / 5) < large_thickness / 5 ? 1.0f : alpha;
-
-            float dist_coef = 1.0f - clamp(0.025f * length(vec2(ex_pos.x, ex_pos.z)), 0.0f, 1.0f);
-            
-            vec3 color = Color;
-            if(-large_thickness <= ex_pos.x && ex_pos.x <= large_thickness)
-                color = vec3(1.0f, 0.0f, 0.0f);
-            if(-large_thickness <= ex_pos.z && ex_pos.z <= large_thickness)
-                color = vec3(0.0f, 0.0f, 1.0f);
-
-            outColor = dist_coef * vec4(color, alpha);
+            float dist_coef = 1.0f - clamp(0.1f * length(vec2(ex_pos.x, ex_pos.z)), 0.0f, 1.0f);
+            vec3 c = Color;
+            if(ex_pos.x == 0)
+                c = vec3(0.0, 0.0, 1.0);
+            else if(ex_pos.z == 0)
+                c = vec3(1.0, 0.0, 0.0);
+            outColor = vec4(c, dist_coef);
         }
     )glsl";
 
@@ -86,30 +77,52 @@ GLuint Grid::CreateProgram()
 }
 
 Grid::Grid(GLuint program)
-    : IDrawable(program), m_size(100.0f)
+    : IDrawable(program)
 {
-    GLfloat gridVertex[] = {
-        -0.5f,  0.0f,  0.5f,
-         0.5f,  0.0f,  0.5f,
-         0.5f,  0.0f, -0.5f,
-        -0.5f,  0.0f, -0.5f
-    };
+    GLfloat gridVertex[4 * size * 3];
+    GLfloat gridColors[4 * size * 3];
+    GLuint gridEbo[4 * size * 2];
+    for(int i = 0; i < size; i++)
+    {
+        float f = (float)(i - size/2);
+        int I = 4 * i * 3;
+        // from -x to +x
+        gridVertex[I] = f;
+        gridVertex[I+1] = 0.0f;
+        gridVertex[I+2] = (float)size/2;
+        gridColors[I] = 1.0f;
+        gridColors[I+1] = 1.0f;
+        gridColors[I+2] = 1.0f;
+        gridEbo[4*i] = 4 * i;
 
-    GLfloat gridColors[] = {
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f
-    };
+        gridVertex[I+3] = f;
+        gridVertex[I+4] = 0.0f;
+        gridVertex[I+5] = -(float)size/2;
+        gridColors[I+3] = 1.0f;
+        gridColors[I+4] = 1.0f;
+        gridColors[I+5] = 1.0f;
+        gridEbo[4*i + 1] = 4*i + 1;
+        
+        // from -z to +z
+        gridVertex[I+6] = (float)size/2;
+        gridVertex[I+7] = 0.0f;
+        gridVertex[I+8] = f;
+        gridColors[I+6] = 1.0f;
+        gridColors[I+7] = 1.0f;
+        gridColors[I+8] = 1.0f;
+        gridEbo[4*i + 2] = 4*i + 2;
 
-    GLuint gridFaces[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
+        gridVertex[I+9] = -(float)size/2;
+        gridVertex[I+10] = 0.0f;
+        gridVertex[I+11] = f;
+        gridColors[I+9] = 1.0f;
+        gridColors[I+10] = 1.0f;
+        gridColors[I+11] = 1.0f;
+        gridEbo[4*i + 3] = 4*i + 3;
+    }
 
-    Init(gridVertex, sizeof(gridVertex), gridColors, sizeof(gridColors), gridFaces, sizeof(gridFaces));   
+    Init(gridVertex, sizeof(gridVertex), gridColors, sizeof(gridColors), gridEbo, sizeof(gridEbo));   
 
-    m_sizeUni = glGetUniformLocation(m_program, "size");
     m_viewUni = glGetUniformLocation(m_program, "view");
     m_projUni = glGetUniformLocation(m_program, "proj");
 }
@@ -123,13 +136,7 @@ void Grid::Draw(glm::mat4 proj, glm::mat4 view) const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
-    glUniform1f(m_sizeUni, m_size);
     glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
-void Grid::SetSize(float size)
-{
-    m_size = size;
+    glDrawElements(GL_LINES, 4 * size * 2, GL_UNSIGNED_INT, 0);
 }
