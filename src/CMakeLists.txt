@@ -10,3 +10,4 @@ target_sources(${PROJECT_NAME}
 )
 
 add_subdirectory(particle_forces)
+add_subdirectory(particle_contacts)
