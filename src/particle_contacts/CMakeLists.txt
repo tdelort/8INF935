@@ -1,0 +1,10 @@
+target_sources(${PROJECT_NAME}
+    PRIVATE
+        NaiveParticleContactGenerator.cpp
+        ParticleCable.cpp
+        ParticleContact.cpp
+        ParticleContactGenerator.cpp
+        ParticleContactResolver.cpp
+        ParticleLink.cpp
+        ParticleRod.cpp
+)
