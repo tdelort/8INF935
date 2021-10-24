@@ -6,7 +6,7 @@
 #include <iostream>
 
 
-GLuint Grid::CreateProgram() const
+GLuint Grid::CreateProgram()
 {
     //Vertex Shader
     const char* gridVertexSource = R"glsl(
@@ -85,8 +85,8 @@ GLuint Grid::CreateProgram() const
     return program;
 }
 
-Grid::Grid()
-    : m_size(100.0f)
+Grid::Grid(GLuint program)
+    : IDrawable(program), m_size(100.0f)
 {
     GLfloat gridVertex[] = {
         -0.5f,  0.0f,  0.5f,
@@ -106,33 +106,8 @@ Grid::Grid()
         0, 1, 2,
         2, 3, 0
     };
-    
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
 
-    // Vertex Data
-    glGenBuffers(1, &m_vertexVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertex), gridVertex, GL_STATIC_DRAW);
-
-    m_program = CreateProgram();
-    GLint positionAttrib = glGetAttribLocation(m_program, "position");
-    glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(positionAttrib);
-
-    // Colors Data
-    glGenBuffers(1, &m_colorsVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_colorsVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(gridColors), gridColors, GL_STATIC_DRAW);
-
-    GLint colorAttrib = glGetAttribLocation(m_program, "color");
-    glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(colorAttrib);
-
-    // EBO
-    glGenBuffers(1, &m_ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gridFaces), gridFaces, GL_STATIC_DRAW);
+    Init(gridVertex, sizeof(gridVertex), gridColors, sizeof(gridColors), gridFaces, sizeof(gridFaces));   
 
     m_sizeUni = glGetUniformLocation(m_program, "size");
     m_viewUni = glGetUniformLocation(m_program, "view");

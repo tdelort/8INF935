@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 Cube::Cube(GLuint program)
-    : m_program(program), m_T(1.0f), m_R(1.0f), m_S(1.0f), m_albedo(1.0f)
+    : IDrawable(program), m_T(1.0f), m_R(1.0f), m_S(1.0f), m_albedo(1.0f)
 {
     /** front  back
      *   3 2   7 6
@@ -50,41 +50,17 @@ Cube::Cube(GLuint program)
         1, 0, 4
     };
 
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
+    Init(cubeVertex, sizeof(cubeVertex), cubeColors, sizeof(cubeColors), cubeFaces, sizeof(cubeFaces));
 
-    // Vertex Data
-    glGenBuffers(1, &m_vertexVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertex), cubeVertex, GL_STATIC_DRAW);
-
-    GLint positionAttrib = glGetAttribLocation(program, "position");
-    glVertexAttribPointer(positionAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(positionAttrib);
-
-    // Colors Data
-    glGenBuffers(1, &m_colorsVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_colorsVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeColors), cubeColors, GL_STATIC_DRAW);
-
-    GLint colorAttrib = glGetAttribLocation(program, "color");
-    glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(colorAttrib);
-
-    // EBO
-    glGenBuffers(1, &m_ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeFaces), cubeFaces, GL_STATIC_DRAW);
-
-    m_modelUni = glGetUniformLocation(program, "model");
-    m_viewUni = glGetUniformLocation(program, "view");
-    m_projUni = glGetUniformLocation(program, "proj");
-    m_albedoUni = glGetUniformLocation(program, "albedo");
+    m_modelUni = glGetUniformLocation(m_program, "model");
+    m_viewUni = glGetUniformLocation(m_program, "view");
+    m_projUni = glGetUniformLocation(m_program, "proj");
+    m_albedoUni = glGetUniformLocation(m_program, "albedo");
 }
 
 Cube::~Cube()
 {
-
+    //TODO
 }
 
 void Cube::Draw(glm::mat4 proj, glm::mat4 view) const

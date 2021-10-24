@@ -24,12 +24,4 @@ private:
     glm::mat4 m_T;
     glm::mat4 m_R;
     glm::mat4 m_S;
-
-    GLuint m_vao;
-    GLuint m_vertexVbo, m_colorsVbo, m_facesVbo;
-    GLuint m_ebo;
-
-    GLuint m_program;
-
-    GLint m_modelUni, m_viewUni, m_projUni, m_albedoUni;
 };
