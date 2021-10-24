@@ -108,7 +108,7 @@ int main()
     cube.SetScale(glm::vec3(0.1f));
     cube.SetColor(glm::vec3(0.0, 0.7, 0.6));
 
-    Grid grid;
+    Grid grid(Grid::CreateProgram());
 
     State appState = State::SET;
 
