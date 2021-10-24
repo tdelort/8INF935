@@ -9,7 +9,7 @@ void ParticleContactResolver::resolveContacts(std::vector<ParticleContact*>* con
 		return;
 	float sRelativeVelocity = contacts->at(0)->calculateSeparatingVelocity();
 	int iContact = 0, nbIteration = 0;
-	while (nbIteration < contacts->size( )  { 
+	while (nbIteration < contacts->size())  { 
 		for (int i = 0; i < contacts->size(); i++)
 		{
 			float iRelativeVelocity = contacts->at(i)->calculateSeparatingVelocity();

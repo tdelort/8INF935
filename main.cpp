@@ -28,6 +28,10 @@
 #include <particle_forces/ParticleDrag.h>
 #include <particle_forces/ParticleForceRegistry.h>
 
+#include <particle_contacts/ParticleContact.h>
+#include <particle_contacts/ParticleRod.h>
+#include <particle_contacts/ParticleContactResolver.h>
+
 //Vertex Shader
 const char* vertexSource = R"glsl(
     #version 130
@@ -102,26 +106,43 @@ int main()
 	Gui gui;
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
 
-    GLuint program = createProgram();
+    Grid grid(Grid::CreateProgram());
 
+    GLuint program = createProgram();
     Cube cube(program);
     cube.SetScale(glm::vec3(0.1f));
     cube.SetColor(glm::vec3(0.0, 0.7, 0.6));
 
-    Grid grid(Grid::CreateProgram());
-
-    State appState = State::SET;
+    Cube cube2(program);
+    cube2.SetScale(glm::vec3(0.1f));
+    cube2.SetColor(glm::vec3(0.0, 0.7, 0.6));
 
     ParticleForceRegistry reg;
 
     Particle particle1;
     particle1.setMass(1);
 
+    Particle particle2;
+    particle2.setMass(1);
+    particle2.setPosition(Vector3D(1.0, 0.0, 0.0));
+
     ParticleAnchoredSpring(10.0f, 1.0f, Vector3D(0.0, 1.0, 0.0));
     reg.AddEntry(&particle1, &ParticleAnchoredSpring(10.0f, 1.0f, Vector3D(0.0, 1.0, 0.0)));
     reg.AddEntry(&particle1, &ParticleGravity(Vector3D(0.0, -9.81, 0.0)));
     reg.AddEntry(&particle1, &ParticleDrag(0.1f, 0.01f));
+    reg.AddEntry(&particle2, &ParticleGravity(Vector3D(0.0, -9.81, 0.0)));
+    reg.AddEntry(&particle2, &ParticleDrag(0.1f, 0.01f));
 
+    ParticleRod rod;
+    rod.particle[0] = &particle1;
+    rod.particle[1] = &particle2;
+    rod.length = 1.0f;
+
+    std::vector<ParticleContact*> contacts;
+
+    ParticleContactResolver contactsResolver;
+
+    State appState = State::SET;
     double lastFrameTime;
 
 	float px, py, pz, vx, vy, vz;
@@ -175,12 +196,19 @@ int main()
             ImGui::End();
 
             // Computation on Particle
+            contacts.clear();
             double deltaTime = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
 
             reg.UpdateForce(deltaTime);
+            rod.AddContact(&contacts);
 
+            std::cout << "avant : " << particle2.velocity().norm() << std::endl;
+            contactsResolver.resolveContacts(&contacts, deltaTime);
+            std::cout << "apres : " << particle2.velocity().norm() << std::endl;
+            
             particle1.Integrate(deltaTime);
+            particle2.Integrate(deltaTime);
             break;
         }
         default:
@@ -200,8 +228,10 @@ int main()
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
 
 		cube.SetPosition(glm::vec3(particle1.position().x(), particle1.position().y(), particle1.position().z()));
+		cube2.SetPosition(glm::vec3(particle2.position().x(), particle2.position().y(), particle2.position().z()));
 
         cube.Draw(proj, view);
+        cube2.Draw(proj, view);
         grid.Draw(proj, view);
         gui.swapBuffers();
 	}
