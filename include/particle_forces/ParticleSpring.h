@@ -17,5 +17,10 @@ private:
 
 public:
 
-    void UpdateForce(Particle* particle, float duration);
+    ParticleSpring(float k, float restLength, Particle* other);
+
+    void UpdateForce(Particle* particle, float duration) override;
+    void SetK(float k);
+    void SetRestLength(float restLength);
+    void SetParticle(Particle* other);
 };
