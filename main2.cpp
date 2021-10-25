@@ -75,8 +75,10 @@ int main()
 
     ParticleForceRegistry reg;
 
+    ParticleAnchoredSpring* pas = new ParticleAnchoredSpring(Params::K * 2, 1.0f, Vector3D(0,0,0));
     for(int i = 0; i < s; i++)
     {
+        reg.AddEntry(blob[i].first, pas);
         for(int p = 0; p < blob.size(); p++)
         {
             if(p != i)
@@ -90,7 +92,7 @@ int main()
                 cables.push_back(c);
             }
         }
-        //reg.AddEntry(&blob.at(j + i*4).first, &ParticleGravity(Vector3D(0, -9.81, 0)));
+        //reg.AddEntry(blob.at(i).first, new ParticleGravity(Vector3D(0, -9.81, 0)));
         reg.AddEntry(blob.at(i).first, new ParticleDrag(0.2f, 0.02f));
     }
 
@@ -98,14 +100,23 @@ int main()
 
     double lastFrameTime = glfwGetTime();
 
+    float px = 0, py = 0, pz = 0;
 	while (gui.isOpen())
 	{
         gui.pollEvents();
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
 
+        ImGui::NewFrame();
+        ImGui::Begin("Config", 0, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Text("Position");
+        ImGui::SliderFloat("Px", &px, -5.0f, 5.0f); ImGui::SameLine();
+        ImGui::SliderFloat("Py", &py, -5.0f, 5.0f); ImGui::SameLine();
+        ImGui::SliderFloat("Pz", &pz, -5.0f, 5.0f);
+        ImGui::End();
+
+        pas->SetAnchor(Vector3D(px,py,pz));
 
         gui.clear(clear_color);
         glm::mat4 view = glm::lookAt(
