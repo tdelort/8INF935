@@ -30,6 +30,7 @@
 
 #include <particle_contacts/ParticleContact.h>
 #include <particle_contacts/ParticleRod.h>
+#include <particle_contacts/ParticleCable.h>
 #include <particle_contacts/ParticleContactResolver.h>
 
 //Vertex Shader
@@ -133,10 +134,11 @@ int main()
     reg.AddEntry(&particle2, &ParticleGravity(Vector3D(0.0, -9.81, 0.0)));
     reg.AddEntry(&particle2, &ParticleDrag(0.1f, 0.01f));
 
-    ParticleRod rod;
-    rod.particle[0] = &particle1;
-    rod.particle[1] = &particle2;
-    rod.length = 1.0f;
+    ParticleCable cable1;
+    cable1.particle[0] = &particle1;
+    cable1.particle[1] = &particle2;
+    cable1.maxlength = 2.0f;
+    cable1.restitution = 1.5f;
 
     std::vector<ParticleContact*> contacts;
 
@@ -201,11 +203,11 @@ int main()
             lastFrameTime = glfwGetTime();
 
             reg.UpdateForce(deltaTime);
-            rod.AddContact(&contacts);
+            cable1.AddContact(&contacts);
 
-            std::cout << "avant : " << particle2.velocity().norm() << std::endl;
+            //std::cout << "avant : " << particle2->velocity().norm() << std::endl;
             contactsResolver.resolveContacts(&contacts, deltaTime);
-            std::cout << "apres : " << particle2.velocity().norm() << std::endl;
+            //std::cout << "apres : " << particle2->velocity().norm() << std::endl;
             
             particle1.Integrate(deltaTime);
             particle2.Integrate(deltaTime);
@@ -218,7 +220,7 @@ int main()
 
         gui.clear(clear_color);
         glm::mat4 view = glm::lookAt(
-            glm::vec3(1.0f, 1.0f, 5.0f),
+            glm::vec3(5.0f, 1.0f, 5.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         );

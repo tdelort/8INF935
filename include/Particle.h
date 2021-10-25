@@ -23,6 +23,7 @@ public:
 	double invMass() const;
 	Vector3D position() const;
 	Vector3D velocity() const;
+	std::vector<Vector3D> forces() const;
 
 	void setPosition(const Vector3D& pos);
 	void setVelocity(const Vector3D& vel);

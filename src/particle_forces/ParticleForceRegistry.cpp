@@ -8,12 +8,12 @@ void ParticleForceRegistry::UpdateForce(float duration)
 {
     // NOTE : Clears some particles multiple times
     // Not a bug, but it is useless
-    std::for_each(m_registry.begin(), m_registry.end(), 
-        [duration](ParticleForceEntry entry)
-        {
-            entry.particle->clearForces();
-        }
-    );
+    //std::for_each(m_registry.begin(), m_registry.end(), 
+    //    [duration](ParticleForceEntry entry)
+    //    {
+    //        entry.particle->clearForces();
+    //    }
+    //);
 
     std::for_each(m_registry.begin(), m_registry.end(), 
         [duration](ParticleForceEntry entry)

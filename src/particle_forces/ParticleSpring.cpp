@@ -6,6 +6,7 @@ void ParticleSpring::UpdateForce(Particle* particle, float duration)
     Vector3D d = particle->position() - m_other->position();
     Vector3D F = -m_k * (d.norm() - m_restLength) * d.normalize();
     particle->addForce(F);
+    m_other->addForce(-F);
 }
 
 ParticleSpring::ParticleSpring(float k, float restLength, Particle* other)

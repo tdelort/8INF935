@@ -26,6 +26,11 @@ Vector3D Particle::velocity() const
 	return m_velocity;
 }
 
+std::vector<Vector3D> Particle::forces() const
+{
+	return m_forces;
+}
+
 void Particle::setPosition(const Vector3D& pos)
 {
 	m_position = pos;
