@@ -23,6 +23,7 @@
 #include <Grid.h>
 #include <Particle.h>
 #include <Shader.h>
+#include <Matrix.h>
 
 #include <particle_forces/ParticleSpring.h>
 #include <particle_forces/ParticleAnchoredSpring.h>
@@ -49,7 +50,7 @@ int main()
 	Gui gui;
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
 
-    int s = 16;
+    int s = 32;
     std::vector<std::pair<Particle*, Cube>> blob;
 
     GLuint shader = createProgram();
@@ -86,7 +87,7 @@ int main()
                 reg.AddEntry(blob[i].first, new ParticleSpring(Params::K, 1.0f, blob[p].first));
                 ParticleCable c;
                 c.maxlength = 1.5f;
-                c.restitution = 1.5f;
+                c.restitution = 1.0f;
                 c.particle[0] = blob[i].first;
                 c.particle[1] = blob[p].first;
                 cables.push_back(c);

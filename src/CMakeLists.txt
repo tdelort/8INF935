@@ -7,6 +7,7 @@ target_sources(${PROJECT_NAME}
 		Cube.cpp
 		Camera.cpp
 		Grid.cpp
+		Matrix.cpp
 )
 
 add_subdirectory(particle_forces)

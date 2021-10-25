@@ -65,13 +65,19 @@ double Vector3D::norm() const
 Vector3D Vector3D::normalize() const
 {	
 	Vector3D result(*this);
+	double n = result.norm();
+	if(n <= 0)
+	{
+		return Vector3D(0, 0, 0);
+	}
 	result /= result.norm();
 	return result;
 }
 
 double Vector3D::dot(const Vector3D& other) const
 {
-	return m_x * other.m_x + m_y * other.m_y + m_z * other.m_z;
+	double d = m_x * other.m_x + m_y * other.m_y + m_z * other.m_z;
+	return d;
 }
 
 Vector3D Vector3D::cross(const Vector3D& other) const

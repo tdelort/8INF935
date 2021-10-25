@@ -4,8 +4,6 @@
 void ParticleSpring::UpdateForce(Particle* particle, float duration)
 {
     Vector3D d = particle->position() - m_other->position();
-    if(d.norm() == 0 || isnan(d.norm()))
-        return;
     Vector3D F = -m_k * (d.norm() - m_restLength) * d.normalize();
     particle->addForce(F);
     m_other->addForce(-F);
