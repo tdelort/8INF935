@@ -17,10 +17,10 @@ private:
     };
 
     using Registry = std::vector<ParticleForceEntry>; 
-    Registry m_registry;
 
 public:
+    Registry m_registry;
 
     void UpdateForce(float duration);
-    void AddEntry(Particle* particle, ParticleForceGenerator* generator);
+    void AddEntry(Particle* p, ParticleForceGenerator* generator);
 };

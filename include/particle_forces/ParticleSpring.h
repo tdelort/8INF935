@@ -1,14 +1,13 @@
 #pragma once
 
 #include "ParticleForceGenerator.h"
+#include "../Particle.h"
 
-class Particle;
 
 class ParticleSpring : public ParticleForceGenerator
 {
 private:
     //other anchor
-    Particle* m_other;
 
     //Spring constant
     float m_k;
@@ -16,6 +15,7 @@ private:
     float m_restLength;
 
 public:
+    Particle* m_other;
 
     ParticleSpring(float k, float restLength, Particle* other);
 

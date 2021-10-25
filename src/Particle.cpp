@@ -74,5 +74,7 @@ void Particle::Integrate(double deltaTime)
 	m_acceleration = m_invMass * std::accumulate(m_forces.cbegin(), m_forces.cend(), Vector3D());
 	// 3
 	m_velocity = m_velocity * std::pow(1 - m_damping, deltaTime) + m_acceleration * deltaTime;
+
+	clearForces();
 }
 

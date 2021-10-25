@@ -6,24 +6,13 @@
 
 void ParticleForceRegistry::UpdateForce(float duration)
 {
-    // NOTE : Clears some particles multiple times
-    // Not a bug, but it is useless
-    //std::for_each(m_registry.begin(), m_registry.end(), 
-    //    [duration](ParticleForceEntry entry)
-    //    {
-    //        entry.particle->clearForces();
-    //    }
-    //);
-
-    std::for_each(m_registry.begin(), m_registry.end(), 
-        [duration](ParticleForceEntry entry)
-        {
-            entry.forceGenerator->UpdateForce(entry.particle, duration);
-        }
-    );
+    for(int i = 0; i < m_registry.size(); i ++)
+    {
+        m_registry[i].forceGenerator->UpdateForce(m_registry[i].particle, duration);
+    }
 }
 
-void ParticleForceRegistry::AddEntry(Particle* particle, ParticleForceGenerator* generator)
+void ParticleForceRegistry::AddEntry(Particle* p, ParticleForceGenerator* generator)
 {
-    m_registry.push_back({particle, generator});
+    m_registry.push_back({p, generator});
 }

@@ -41,7 +41,7 @@ enum class State {
 };
 
 namespace Params {
-    const float K = 1.0f;
+    const float K = 0.5f;
 };
 
 int main()
@@ -49,62 +49,50 @@ int main()
 	Gui gui;
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
 
-    std::vector<std::pair<Particle, Cube>> blob;
+    int s = 16;
+    std::vector<std::pair<Particle*, Cube>> blob;
 
     GLuint shader = createProgram();
 
-    int sx = 4, sz = 4;
-    for(int i = 0; i < sx; i++)
+    for(int i = 0; i < s; i++)
     {
-        for(int j = 0; j < sz; j++)
-        {
-            float pos[3] = {i - 2.0, -j + 2.0, 0 };
-            Particle p;
-            p.setMass(1.0);
-            p.setPosition(Vector3D(pos[0], pos[1], pos[2]));
-            
-            Cube c(shader);
-            c.SetScale(glm::vec3(0.1f));
-            c.SetColor(glm::vec3(1.0f));
-            c.SetPosition(glm::vec3(pos[0], pos[1], pos[2]));
+        float pos[3] = {std::rand() % 4 - 2, std::rand() % 4 - 2, std::rand() % 4 - 2 };
+        Particle* p = new Particle();
+        p->setMass(1.0);
+        p->setPosition(Vector3D(pos[0], pos[1], pos[2]));
+        
+        Cube c(shader);
+        c.SetScale(glm::vec3(0.1f));
+        c.SetColor(glm::vec3(1.0f));
+        c.SetPosition(glm::vec3(pos[0], pos[1], pos[2]));
 
-            blob.push_back(std::pair<Particle, Cube>(p, c));
-        }
+        blob.push_back(std::pair<Particle*, Cube>(p, c));
     }
+
+    ParticleContactResolver contactsResolver;
+    std::vector<ParticleContact*> contacts;
+    std::vector<ParticleCable> cables;
 
     ParticleForceRegistry reg;
 
-    for(int i = 0; i < sx; i++)
+    for(int i = 0; i < s; i++)
     {
-        for(int j = 0; j < sz; j++)
-        {   
-            std::cout << "i j " << i << " " << j << std::endl;
-            bool a = j < sz - 1;
-            bool b = i < sx - 1;
-            if(a)
+        for(int p = 0; p < blob.size(); p++)
+        {
+            if(p != i)
             {
-                reg.AddEntry(&blob.at(j + i*sx).first, &ParticleSpring(Params::K, 1.0f, &blob.at((j+1) + sx*i).first));
+                reg.AddEntry(blob[i].first, new ParticleSpring(Params::K, 1.0f, blob[p].first));
+                ParticleCable c;
+                c.maxlength = 1.5f;
+                c.restitution = 1.5f;
+                c.particle[0] = blob[i].first;
+                c.particle[1] = blob[p].first;
+                cables.push_back(c);
             }
-
-            if(b)
-            {
-                reg.AddEntry(&blob.at(j + i*sx).first, &ParticleSpring(Params::K, 1.0f, &blob.at(j + sx*(i + 1)).first));
-                std::cout << "con : " << (j + i*sx) << " " << (j + sx*(i + 1)) << std::endl;
-            }
-
-            if(a && b)
-            {
-                reg.AddEntry(&blob.at(j + i*sx).first, &ParticleSpring(Params::K, 1.0f, &blob.at((j+1) + sx*(i + 1)).first));
-            }
-
-            //reg.AddEntry(&blob.at(j + i*4).first, &ParticleGravity(Vector3D(0, -9.81, 0)));
-            //reg.AddEntry(&blob.at(j + i*4).first, &ParticleDrag(0.1f, 0.01f));
         }
+        //reg.AddEntry(&blob.at(j + i*4).first, &ParticleGravity(Vector3D(0, -9.81, 0)));
+        reg.AddEntry(blob.at(i).first, new ParticleDrag(0.2f, 0.02f));
     }
-
-    blob[15].second.SetColor(glm::vec3(0,1,1));
-
-    std::cout << blob.size() << std::endl;
 
     Grid grid(Grid::CreateProgram());
 
@@ -133,19 +121,24 @@ int main()
         double deltaTime = glfwGetTime() - lastFrameTime;
         lastFrameTime = glfwGetTime();
 
-        for(int i = 0; i < blob.size(); i++)
-            blob[i].first.clearForces();
-
-        std::cout << "avant " << blob[15].first.forces().size() << std::endl;
+        contacts.clear();
+        //std::cout << "avant " << blob[15].first.forces().size() << std::endl;
         reg.UpdateForce(deltaTime);
-        std::cout << "apres " << blob[15].first.forces().size() << std::endl;
+        //std::cout << "apres " << blob[15].first.forces().size() << std::endl;
+
+        for(auto cable : cables)
+        {
+            cable.AddContact(&contacts);
+        }
+
+        contactsResolver.resolveContacts(&contacts, deltaTime);
 
         for(int i = 0; i < blob.size(); i++)
-            blob[i].first.Integrate(deltaTime);
+            blob[i].first->Integrate(deltaTime);
 
         for(int i = 0; i < blob.size(); i++)
         {
-            Vector3D v = blob[i].first.position();
+            Vector3D v = blob[i].first->position();
             blob[i].second.SetPosition(glm::vec3(v.x(), v.y(), v.z()));
             blob[i].second.Draw(proj, view);
         }
