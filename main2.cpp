@@ -17,6 +17,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <iostream>
+#include <cstdlib>
 
 #include <Gui.h>
 #include <Cube.h>
@@ -45,6 +46,11 @@ namespace Params {
     const float K = 0.5f;
 };
 
+inline float frand(int lo, int hi)
+{
+    return lo + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(hi-lo)));
+}
+
 int main()
 {
 	Gui gui;
@@ -57,7 +63,7 @@ int main()
 
     for(int i = 0; i < s; i++)
     {
-        float pos[3] = {std::rand() % 4 - 2, std::rand() % 4 - 2, std::rand() % 4 - 2 };
+        float pos[3] = {frand(-2, 2), frand(-2, 2), frand(-2, 2)};
         Particle* p = new Particle();
         p->setMass(1.0);
         p->setPosition(Vector3D(pos[0], pos[1], pos[2]));

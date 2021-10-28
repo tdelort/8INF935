@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS)
+
 project(PhysicsEngine)
 
 add_library(${PROJECT_NAME} STATIC)
@@ -9,5 +11,5 @@ add_subdirectory(libs)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} IMGUI GLAD glm::glm)
 
-add_executable(${PROJECT_NAME}Tests main2.cpp)
+add_executable(${PROJECT_NAME}Tests matrix_tests.cpp)
 target_link_libraries(${PROJECT_NAME}Tests ${PROJECT_NAME})
