@@ -6,11 +6,11 @@
 class Quaternion;
 class Vector3D;
 
-class Matrix3x4 : public Matrix<double,3,4>
+class Matrix3x4 : public Matrix<float,3,4>
 {
 public:
     Matrix3x4();
-    Matrix3x4(std::initializer_list<std::initializer_list<double>>);
+    Matrix3x4(std::initializer_list<std::initializer_list<float>>);
 
     Matrix3x4 operator*(const Matrix3x4& other) const;
     Matrix3x4 operator*(const Vector3D& other) const;

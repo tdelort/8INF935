@@ -9,7 +9,7 @@ Matrix3x4::Matrix3x4()
     : Matrix<double,3,4>()
 { }
 
-Matrix3x4::Matrix3x4(std::initializer_list<std::initializer_list<double>> row_list)
+Matrix3x4::Matrix3x4(std::initializer_list<std::initializer_list<float>> row_list)
     : Matrix<double,3,4>(row_list)
 { }
 
