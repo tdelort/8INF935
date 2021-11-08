@@ -8,6 +8,7 @@ class Vector3D;
 
 class Matrix3x4 : public Matrix<float,3,4>
 {
+    using Base = Matrix<float,3,4>;
 public:
     Matrix3x4();
     Matrix3x4(std::initializer_list<std::initializer_list<float>>);

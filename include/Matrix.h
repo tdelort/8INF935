@@ -8,19 +8,47 @@ template<typename T, size_t N, size_t M>
 class Matrix
 {
 protected:
-    double m_data[N * M];
+    T m_data[N * M];
     size_t m_n;
     size_t m_m;
 public:
     Matrix();
     Matrix(std::initializer_list<std::initializer_list<T>> row_list);
+    
+    // getters and setters for the matrix elements
+    T operator()(size_t i, size_t j) const 
+    { 
+        return m_data[i * m_m + j]; 
+    };
+
+    T& operator()(size_t i, size_t j) 
+    { 
+        return m_data[i * m_m + j]; 
+    };
+    size_t n() const { return m_n; };
+    size_t m() const { return m_m; };
+
+    // stream operator for printing the matrix
+    friend std::ostream& operator<<(std::ostream& os, const Matrix<T, N, M>& m)
+    {
+        for (size_t i = 0; i < m.m_n; i++)
+        {
+            for (size_t j = 0; j < m.m_m; j++)
+            {
+                os << m(i, j) << " ";
+            }
+            os << std::endl;
+        }
+        return os;
+    }
+
 };
 
 template<typename T, size_t N, size_t M>
 Matrix<T,N,M>::Matrix()
     : m_n(N), m_m(M)
 {
-    memset(m_data, 0, sizeof(double) * m_n * m_m);
+    memset(m_data, 0, sizeof(T) * m_n * m_m);
 }
 
 template<typename T, size_t N, size_t M>

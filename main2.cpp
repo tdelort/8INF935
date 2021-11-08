@@ -56,7 +56,7 @@ int main()
 	Gui gui;
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
 
-    int s = 32;
+    int s = 16;
     std::vector<std::pair<Particle*, Cube>> blob;
 
     GLuint shader = createProgram();
@@ -144,6 +144,7 @@ int main()
         reg.UpdateForce(deltaTime);
         //std::cout << "apres " << blob[15].first.forces().size() << std::endl;
 
+        //contacts after forces
         for(auto cable : cables)
         {
             cable.AddContact(&contacts);
