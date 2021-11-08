@@ -14,7 +14,7 @@ public:
     Matrix3x3(std::initializer_list<std::initializer_list<float>>);
 
     Matrix3x3 operator*(const Matrix3x3& other) const;
-    Matrix3x3 operator*(const Vector3D& other) const;
+    Vector3D operator*(const Vector3D& other) const;
 
     Matrix3x3 Inverse();
     Matrix3x3 Transpose();
