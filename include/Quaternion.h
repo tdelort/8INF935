@@ -3,11 +3,12 @@
 class Quaternion
 {
 private:
+    // w (x y z)
     float value[4];
 
 public:
     Quaternion();
-    Quaternion(float w, float x, float y, float z);
+    Quaternion(float x, float y, float z, float w);
 
     void Normalize();
 
@@ -22,4 +23,10 @@ public:
     float y() const;
     float z() const;
     float w() const;
+
+    // x y z w setters
+    float& x();
+    float& y();
+    float& z();
+    float& w();
 };
