@@ -1,6 +1,7 @@
 #include "Matrix3x3.h"
 #include "Matrix.h"
 #include "Vector3D.h"
+#include "Quaternion.h"
 
 #include <initializer_list>
 
@@ -30,15 +31,15 @@ Matrix3x3 Matrix3x3::operator*(const Matrix3x3& other) const
 
 Vector3D Matrix3x3::operator*(const Vector3D& other) const
 {
-    Vector3D res;
+    double res[3];
     for (int i = 0; i < 3; i++)
     {
-        float a = m_data[i * m_m + 0] * other.x();
-        float b = m_data[i * m_m + 1] * other.y();
-        float c = m_data[i * m_m + 2] * other.z();
-        res.setX(a + b + c);
+        float a = (*this)(i, 0) * other.x();
+        float b = (*this)(i, 1) * other.y();
+        float c = (*this)(i, 2) * other.z();
+        res[i] = a + b + c;
     }
-    return res;
+    return Vector3D(res[0], res[1], res[2]);
 }
 
 Matrix3x3 Matrix3x3::Inverse()

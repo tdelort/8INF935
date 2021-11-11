@@ -22,7 +22,7 @@ public:
     };
 
     T& operator()(size_t i, size_t j) 
-    { 
+    {
         return m_data[i * m_m + j]; 
     };
     size_t n() const { return m_n; };
@@ -33,11 +33,12 @@ public:
     {
         for (size_t i = 0; i < m.m_n; i++)
         {
+            os << "[ ";
             for (size_t j = 0; j < m.m_m; j++)
             {
-                os << m(i, j) << " ";
+                os << m(i, j) << "\t";
             }
-            os << std::endl;
+            os << " ]" << std::endl;
         }
         return os;
     }
@@ -68,7 +69,7 @@ Matrix<T,N,M>::Matrix(std::initializer_list<std::initializer_list<T>> row_list)
         if(row.size() != m_m)
         {
             std::cerr << "Matrix<T,N,M>::Martix(std::initializer_list<std::initializer_list<T>>) : ";
-            std::cerr << "row with length " << row_list.size() << " was given but was expecting " << m_m << std::endl;
+            std::cerr << "row with length " << row.size() << " was given but was expecting " << m_m << std::endl;
             assert(false);
         }
 

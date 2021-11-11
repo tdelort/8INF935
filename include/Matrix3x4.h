@@ -14,7 +14,7 @@ public:
     Matrix3x4(std::initializer_list<std::initializer_list<float>>);
 
     Matrix3x4 operator*(const Matrix3x4& other) const;
-    Matrix3x4 operator*(const Vector3D& other) const;
+    Vector3D operator*(const Vector3D& other) const;
 
     Matrix3x4 Inverse();
 
