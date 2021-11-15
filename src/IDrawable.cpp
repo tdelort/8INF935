@@ -7,7 +7,7 @@ IDrawable::IDrawable(GLuint program)
     : m_program(program)
 {}
 
-void IDrawable::Init(GLfloat vertex[], size_t sizeVertex, GLfloat colors[], size_t sizeColors, GLuint ebo[], size_t sizeEbo)
+void IDrawable::Init(GLfloat* vertex, size_t sizeVertex, GLfloat* colors, size_t sizeColors, GLuint* ebo, size_t sizeEbo)
 {
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);

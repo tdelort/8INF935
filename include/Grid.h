@@ -12,7 +12,7 @@ public:
     Grid(GLuint program);
     ~Grid();
 
-    void Draw(glm::mat4 proj, glm::mat4 view) const override;
+    void Draw(const glm::mat4& proj, const glm::mat4& view) const override;
 
     //"small" helper function
     static GLuint CreateProgram();

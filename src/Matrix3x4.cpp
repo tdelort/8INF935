@@ -7,11 +7,11 @@
 #include <initializer_list>
 
 Matrix3x4::Matrix3x4()
-    : Base(), m_inverseDirty(true)
+    : Base()
 { }
 
 Matrix3x4::Matrix3x4(std::initializer_list<std::initializer_list<float>> row_list)
-    : Base(row_list), m_inverseDirty(true)
+    : Base(row_list)
 { }
 
 Matrix3x4 Matrix3x4::operator*(const Matrix3x4& other) const

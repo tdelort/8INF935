@@ -6,11 +6,13 @@
 
 #include <glm/glm.hpp>
 
-class Cube : public IDrawable
+#include <string>
+
+class ObjMesh : public IDrawable
 {
 public:
-    Cube(GLuint program);
-    ~Cube();
+    ObjMesh(GLuint program, const std::string& fileName);
+    ~ObjMesh();
 
     void Draw(const glm::mat4& proj, const glm::mat4& view) const override;
 
@@ -20,6 +22,8 @@ public:
     void SetColor(const glm::vec3& rgb);
 
 private:
+    unsigned int m_numIndices;
+
     glm::vec3 m_albedo;
     glm::mat4 m_T;
     glm::mat4 m_R;
