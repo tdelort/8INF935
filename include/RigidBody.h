@@ -36,6 +36,6 @@ class RigidBody
 
     private:
 
-    Vector3D worldPosition(const Vector3D& local);
+    Vector3D WorldPosition(const Vector3D& local);
     
 };
