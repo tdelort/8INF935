@@ -52,8 +52,13 @@ inline float frand(int lo, int hi)
     return lo + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(hi-lo)));
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    if(argc < 2) {
+        std::cout << "Usage: " << argv[0] << " <mesh_file>" << std::endl;
+        return -1;
+    }
+
 	Gui gui;
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
 
@@ -70,7 +75,7 @@ int main()
         p->setPosition(Vector3D(pos[0], pos[1], pos[2]));
         
         std::cout << "debug" << std::endl;
-        ObjMesh c(shader, "D:\\0 - Code\\UQAC\\8INF935 - Math et Physique pour Info\\Projet\\teapot.obj");
+        ObjMesh c(shader, argv[1]);
         c.SetScale(glm::vec3(0.3f));
         c.SetColor(glm::vec3(1.0f));
         c.SetPosition(glm::vec3(pos[0], pos[1], pos[2]));
