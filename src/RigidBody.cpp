@@ -6,7 +6,7 @@ void RigidBody::Integrate(float duration)
 }
 void RigidBody::AddForce(const Vector3D& force)
 {
-    m_forceAccum =+ force;
+    m_forceAccum += force;
 }
 
 void RigidBody::addForceAtPoint(const Vector3D& force, const Vector3D& pointMonde)

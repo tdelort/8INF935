@@ -11,7 +11,7 @@ target_sources(${PROJECT_NAME}
 		Matrix3x3.cpp
 		Matrix3x4.cpp
 		Quaternion.cpp
-		RigidBody.cpp
+		#RigidBody.cpp
 )
 
 add_subdirectory(particle_forces)
