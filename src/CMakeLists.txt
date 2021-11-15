@@ -5,6 +5,7 @@ target_sources(${PROJECT_NAME}
 		Gui.cpp
 		IDrawable.cpp
 		Cube.cpp
+		ObjMesh.cpp
 		Camera.cpp
 		Grid.cpp
 		Matrix3x3.cpp

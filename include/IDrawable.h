@@ -8,7 +8,7 @@ class IDrawable {
 public:
     IDrawable(GLuint program);
     void Init(GLfloat vertex[], size_t sizeVertex, GLfloat colors[], size_t sizeColors, GLuint ebo[], size_t sizeEbo);
-    virtual void Draw(glm::mat4 proj, glm::mat4 view) const = 0;
+    virtual void Draw(const glm::mat4& proj, const glm::mat4& view) const = 0;
 protected:
 
     GLuint m_vao;

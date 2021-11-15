@@ -63,7 +63,7 @@ Cube::~Cube()
     //TODO
 }
 
-void Cube::Draw(glm::mat4 proj, glm::mat4 view) const
+void Cube::Draw(const glm::mat4& proj, const glm::mat4& view) const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
@@ -80,11 +80,11 @@ void Cube::SetPosition(const glm::vec3& position)
     m_T = glm::translate(glm::mat4(1.0f), position);
 }
 
-void Cube::SetRotation(const glm::vec3& position)
+void Cube::SetRotation(const glm::vec3& rotation)
 {
-    glm::mat4 rX = glm::rotate(glm::mat4(1.0f), position.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    glm::mat4 rY = glm::rotate(glm::mat4(1.0f), position.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 rZ = glm::rotate(glm::mat4(1.0f), position.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 rX = glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 rY = glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rZ = glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
     m_R = rZ * rY * rX;
 }
 

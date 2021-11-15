@@ -132,7 +132,7 @@ Grid::~Grid()
     
 }
 
-void Grid::Draw(glm::mat4 proj, glm::mat4 view) const
+void Grid::Draw(const glm::mat4& proj, const glm::mat4& view) const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);

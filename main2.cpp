@@ -21,6 +21,7 @@
 
 #include <Gui.h>
 #include <Cube.h>
+#include <ObjMesh.h>
 #include <Grid.h>
 #include <Particle.h>
 #include <Shader.h>
@@ -56,8 +57,8 @@ int main()
 	Gui gui;
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
 
-    int s = 16;
-    std::vector<std::pair<Particle*, Cube>> blob;
+    int s = 3;
+    std::vector<std::pair<Particle*, ObjMesh>> blob;
 
     GLuint shader = createProgram();
 
@@ -68,12 +69,14 @@ int main()
         p->setMass(1.0);
         p->setPosition(Vector3D(pos[0], pos[1], pos[2]));
         
-        Cube c(shader);
-        c.SetScale(glm::vec3(0.1f));
+        std::cout << "debug" << std::endl;
+        ObjMesh c(shader, "D:\\0 - Code\\UQAC\\8INF935 - Math et Physique pour Info\\Projet\\teapot.obj");
+        c.SetScale(glm::vec3(0.3f));
         c.SetColor(glm::vec3(1.0f));
         c.SetPosition(glm::vec3(pos[0], pos[1], pos[2]));
+        c.SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
 
-        blob.push_back(std::pair<Particle*, Cube>(p, c));
+        blob.push_back(std::pair<Particle*, ObjMesh>(p, c));
     }
 
     ParticleContactResolver contactsResolver;
