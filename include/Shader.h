@@ -12,9 +12,12 @@ const char* vertexSource = R"glsl(
 	uniform mat4 view;
 	uniform mat4 proj;
 
+    out vec3 fragPos;
+
 	void main()
 	{
 		gl_Position = proj * view * model * vec4(position, 1.0);
+        fragPos = vec3(model * vec4(position, 1.0));
 	}
 )glsl";
 
@@ -22,10 +25,13 @@ const char* vertexSource = R"glsl(
 const char* geometrySource = R"glsl(
     #version 150
 
+    in vec3 fragPos[];
+
     layout(triangles) in;
     layout(triangle_strip, max_vertices=3) out;
 
-    out vec3 normal;
+    out vec3 gs_normal;
+    out vec3 gs_fragPos;
 
     void main( void )
     {
@@ -36,7 +42,8 @@ const char* geometrySource = R"glsl(
         for( int i=0; i<gl_in.length(); ++i )
         {
             gl_Position = gl_in[i].gl_Position;
-            normal = N;
+            gs_fragPos = fragPos[i];
+            gs_normal = N;
             EmitVertex();
         }
 
@@ -49,15 +56,20 @@ const char* fragmentSource = R"glsl(
     #version 150
 
     uniform vec3 albedo;
-    in vec3 normal;
+    in vec3 gs_normal;
+    in vec3 gs_fragPos;
 
-    vec3 lightPos = vec3(0.0, 0.0, 0.0);
+    vec3 lightPos = vec3(0.0, 1.0, 0.0);
+    vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
 	out vec4 outColor;
 
 	void main()
 	{
-		outColor = vec4(normal, 1.0);
+        float intensity = max(dot(normalize(gs_normal), normalize(lightPos - gs_fragPos)), 0.0);
+        vec3 diffuse = lightColor * intensity; 
+        vec3 ambient = lightColor * 0.1;
+		outColor = vec4((diffuse + ambient) * albedo, 1.0);
 	}
 )glsl";
 
