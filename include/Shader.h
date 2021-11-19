@@ -35,9 +35,10 @@ const char* geometrySource = R"glsl(
 
     void main( void )
     {
-        vec3 a = ( gl_in[1].gl_Position - gl_in[0].gl_Position ).xyz;
-        vec3 b = ( gl_in[2].gl_Position - gl_in[0].gl_Position ).xyz;
-        vec3 N = normalize( cross( b, a ) );
+        vec3 U = gl_in[1].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+        vec3 V = gl_in[2].gl_Position.xyz - gl_in[0].gl_Position.xyz;
+        vec3 N = normalize( cross( V, U ) );
+        N = vec3(N.x, N.y, -N.z);
 
         for( int i=0; i<gl_in.length(); ++i )
         {
@@ -59,7 +60,7 @@ const char* fragmentSource = R"glsl(
     in vec3 gs_normal;
     in vec3 gs_fragPos;
 
-    vec3 lightPos = vec3(0.0, 1.0, 0.0);
+    vec3 lightPos = vec3(0.0, 0.0, 0.0);
     vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
 	out vec4 outColor;

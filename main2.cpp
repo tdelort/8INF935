@@ -6,9 +6,6 @@
 
 #include <glad/glad.h>
 
-#if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <GLES2/gl2.h>
-#endif
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 #include <glm/glm.hpp>
@@ -20,12 +17,10 @@
 #include <cstdlib>
 
 #include <Gui.h>
-#include <Cube.h>
 #include <ObjMesh.h>
 #include <Grid.h>
 #include <Particle.h>
 #include <Shader.h>
-#include <Matrix.h>
 
 #include <particle_forces/ParticleSpring.h>
 #include <particle_forces/ParticleAnchoredSpring.h>
@@ -37,6 +32,8 @@
 #include <particle_contacts/ParticleRod.h>
 #include <particle_contacts/ParticleCable.h>
 #include <particle_contacts/ParticleContactResolver.h>
+
+#include <PhysicsEngine.h>
 
 enum class State {
     SET,
@@ -54,10 +51,10 @@ inline float frand(int lo, int hi)
 
 int main(int argc, char** argv)
 {
-    if(argc < 2) {
-        std::cout << "Usage: " << argv[0] << " <mesh_file>" << std::endl;
-        return -1;
-    }
+    //if(argc < 2) {
+    //    std::cout << "Usage: " << argv[0] << " <mesh_file>" << std::endl;
+    //    return -1;
+    //}
 
 	Gui gui;
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
@@ -74,41 +71,36 @@ int main(int argc, char** argv)
         p->setMass(1.0);
         p->setPosition(Vector3D(pos[0], pos[1], pos[2]));
         
-        std::cout << "debug" << std::endl;
-        ObjMesh c(shader, argv[1]);
-        c.SetScale(glm::vec3(0.3f));
+        //ObjMesh c(shader, argv[1]);
+        ObjMesh c(shader, "../../teapot.obj");
+        c.SetScale(glm::vec3(0.15f));
         c.SetColor(glm::vec3(1.0f));
         c.SetPosition(glm::vec3(pos[0], pos[1], pos[2]));
         c.SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
 
         blob.push_back(std::pair<Particle*, ObjMesh>(p, c));
+        PhysicsEngine::AddParticle(p);
     }
 
-    ParticleContactResolver contactsResolver;
-    std::vector<ParticleContact*> contacts;
-    std::vector<ParticleCable> cables;
-
-    ParticleForceRegistry reg;
-
-    ParticleAnchoredSpring* pas = new ParticleAnchoredSpring(Params::K * 2, 1.0f, Vector3D(0,0,0));
+    ParticleAnchoredSpring* pas = new ParticleAnchoredSpring(Params::K * 5, 1.0f, Vector3D(0,0,0));
+    ParticleDrag* pd = new ParticleDrag(0.2f, 0.02f);
     for(int i = 0; i < s; i++)
     {
-        reg.AddEntry(blob[i].first, pas);
+        PhysicsEngine::AddParticleForceGenerator(blob[i].first, pas);
+        PhysicsEngine::AddParticleForceGenerator(blob[i].first, pd);
         for(int p = 0; p < blob.size(); p++)
         {
-            if(p != i)
+            if(p != i && frand(0, 1) > 0.7f)
             {
-                reg.AddEntry(blob[i].first, new ParticleSpring(Params::K, 1.0f, blob[p].first));
-                ParticleCable c;
-                c.maxlength = 1.5f;
-                c.restitution = 1.0f;
-                c.particle[0] = blob[i].first;
-                c.particle[1] = blob[p].first;
-                cables.push_back(c);
+                PhysicsEngine::AddParticleForceGenerator(blob[i].first, new ParticleSpring(Params::K, 1.0f, blob[p].first));
+                ParticleCable* c = new ParticleCable();
+                c->maxlength = 1.5f;
+                c->restitution = 1.0f;
+                c->particle[0] = blob[i].first;
+                c->particle[1] = blob[p].first;
+                PhysicsEngine::AddParticleContactGenerator(c);
             }
         }
-        //reg.AddEntry(blob.at(i).first, new ParticleGravity(Vector3D(0, -9.81, 0)));
-        reg.AddEntry(blob.at(i).first, new ParticleDrag(0.2f, 0.02f));
     }
 
     Grid grid(Grid::CreateProgram());
@@ -120,6 +112,7 @@ int main(int argc, char** argv)
 	{
         gui.pollEvents();
 
+        // ################### IMGUI ###################
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
 
@@ -133,9 +126,17 @@ int main(int argc, char** argv)
 
         pas->SetAnchor(Vector3D(px,py,pz));
 
+        // ################### PHYSICS ###################
+        double deltaTime = glfwGetTime() - lastFrameTime;
+        lastFrameTime = glfwGetTime();
+        PhysicsEngine::Update(deltaTime);
+
+
+        // ################### DRAWING ###################
         gui.clear(clear_color);
+
         glm::mat4 view = glm::lookAt(
-            glm::vec3(5.0f, 1.0f, 5.0f),
+            glm::vec3(0.0f, 1.0f, 5.0f),
             glm::vec3(0.0f, 0.0f, 0.0f),
             glm::vec3(0.0f, 1.0f, 0.0f)
         );
@@ -144,32 +145,12 @@ int main(int argc, char** argv)
         glfwGetWindowSize(gui.GetWindow(), &width, &height);
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
 
-        double deltaTime = glfwGetTime() - lastFrameTime;
-        lastFrameTime = glfwGetTime();
-
-        contacts.clear();
-        //std::cout << "avant " << blob[15].first.forces().size() << std::endl;
-        reg.UpdateForce(deltaTime);
-        //std::cout << "apres " << blob[15].first.forces().size() << std::endl;
-
-        //contacts after forces
-        for(auto cable : cables)
-        {
-            cable.AddContact(&contacts);
-        }
-
-        contactsResolver.resolveContacts(&contacts, deltaTime);
-
-        for(int i = 0; i < blob.size(); i++)
-            blob[i].first->Integrate(deltaTime);
-
         for(int i = 0; i < blob.size(); i++)
         {
             Vector3D v = blob[i].first->position();
             blob[i].second.SetPosition(glm::vec3(v.x(), v.y(), v.z()));
             blob[i].second.Draw(proj, view);
         }
-
 
         grid.Draw(proj, view);
         gui.swapBuffers();
