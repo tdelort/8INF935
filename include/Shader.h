@@ -1,4 +1,6 @@
-#include <glad/glad.h>
+#pragma once
+
+#include <iostream>
 
 // Will be changed with a class that reads .glsl files
 
@@ -73,40 +75,3 @@ const char* fragmentSource = R"glsl(
 		outColor = vec4((diffuse + ambient) * albedo, 1.0);
 	}
 )glsl";
-
-GLuint createProgram()
-{
-    // Creating Vertex shader
-    GLint status;
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
-
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-    std::cout << "Vertex shader compile status : " << status << std::endl;
-
-    // Creating Geometry shader
-    GLuint geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-    glShaderSource(geometryShader, 1, &geometrySource, NULL);
-    glCompileShader(geometryShader);
-
-    glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &status);
-    std::cout << "Geometry shader compile status : " << status << std::endl;
-
-    // Creating Fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
-    std::cout << "Fragment shader compile status : " << status << std::endl;
-    
-    // Creating shader program and linking it
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, geometryShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-    glUseProgram(program);
-    return program;
-}
