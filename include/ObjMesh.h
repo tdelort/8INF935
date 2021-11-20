@@ -11,6 +11,7 @@
 class ObjMesh : public IDrawable
 {
 public:
+    ObjMesh();
     ObjMesh(GLuint program, const std::string& fileName);
     ~ObjMesh();
 
