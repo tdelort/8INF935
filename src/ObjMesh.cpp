@@ -95,10 +95,6 @@ ObjMesh::ObjMesh(GLuint program, const std::string& fileName)
         //ignore exception
     }
 
-    std::cout << "vertices : " << vertices.size() << std::endl;
-    std::cout << "vertexColor : " << vertexColors.size() << std::endl;
-    std::cout << "faces : " << faces.size() << std::endl;
-    
     m_numIndices = faces.size();
     Init(vertices.data(), vertices.size() * sizeof(GLfloat), vertexColors.data(), vertexColors.size() * sizeof(GLfloat), faces.data(), faces.size() * sizeof(GLuint));
 
