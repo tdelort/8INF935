@@ -29,6 +29,7 @@
 #include <ObjMesh.h>
 #include <Grid.h>
 #include <Shader.h>
+#include <RigidBody.h>
 
 GLuint createProgram()
 {
@@ -89,7 +90,7 @@ void Demo::ImguiSampleDemo()
 
     ImGui::NewFrame();
     ImGui::Begin("Sample Demo", 0, ImGuiWindowFlags_AlwaysAutoResize);
-    ImGui::SliderFloat("Camera rotation", &r, 0, 3.14 * 2);
+    ImGui::SliderFloat("Camera rotation", &r, 0, 3.14f * 2.0f);
     if (ImGui::Button("Back"))
         demoState = DemoState::MENU;
     ImGui::End();
@@ -102,7 +103,7 @@ void Demo::ImguiCollisionDemo()
 
     ImGui::NewFrame();
     ImGui::Begin("Collision Demo", 0, ImGuiWindowFlags_AlwaysAutoResize);
-    ImGui::SliderFloat("Camera rotation", &r, 0, 3.14 * 2);
+    ImGui::SliderFloat("Camera rotation", &r, 0, 3.14f * 2.0f);
     if (ImGui::Button("Back"))
         demoState = DemoState::MENU;
     ImGui::End();
@@ -123,19 +124,38 @@ void Demo::run()
     mesh.SetPosition(glm::vec3(0, 0, 0));
     mesh.SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
 
+    RigidBody rb = new RigidBody();
+    rb.AddForce(glm::vec3(0, -9.81f, 0));
+
+    PhysicsEngine::AddRigidBody(&rb);
+
+    ObjMesh mesh2(createProgram(), meshPath);
+    mesh2.SetScale(glm::vec3(0.3f));
+    mesh2.SetColor(glm::vec3(1.0f));
+    mesh2.SetPosition(glm::vec3(1, 0, 0));
+    mesh2.SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
+
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
     r = 0;
+
+    double lastFrameTime = glfwGetTime();
 
 	while(gui.isOpen())
     {
         gui.pollEvents();
 
+        // ################### IMGUI ###################
         if (demoState == DemoState::MENU)
             ImguiMenu();
         else if (demoState == DemoState::SAMPLE_DEMO)
             ImguiSampleDemo();
         else if (demoState == DemoState::COLLISION_DEMO)
             ImguiCollisionDemo();
+
+        // ################### PHYSICS ###################
+        double deltaTime = glfwGetTime() - lastFrameTime;
+        lastFrameTime = glfwGetTime();
+        PhysicsEngine::Update(deltaTime);
 
         gui.clear(clear_color);
         glm::mat4 view = glm::lookAt(
@@ -148,7 +168,12 @@ void Demo::run()
         glfwGetWindowSize(gui.GetWindow(), &width, &height);
         glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
 
+        Vector3D r = rb->GetRotation();
+        Vector3D v = rb->GetPosition();
+        mesh.SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+        mesh.SetRotation(glm::vec3(r.x(), r.y(), r.z()));
         mesh.Draw(proj, view);
+        //mesh2.Draw(proj, view);
         grid.Draw(proj, view);
         gui.swapBuffers();
     }

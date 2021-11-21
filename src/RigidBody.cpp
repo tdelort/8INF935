@@ -27,6 +27,16 @@ void RigidBody::ClearAccumulator()
     m_torqueAccum = Vector3D(0,0,0);
 }
 
+Vector3D RigidBody::GetPosition() const
+{
+    return m_position;
+}
+
+Vector3D RigidBody::GetRotation() const
+{
+    return m_orientation.Euler();
+}
+
 Vector3D RigidBody::WorldPosition(const Vector3D& local)    
 {
     return m_transformMtrix.Inverse()*local;

@@ -1,5 +1,7 @@
 #include "Quaternion.h"
 
+#include "Vector3D.h"
+
 #include <iostream>
 
 Quaternion::Quaternion()
@@ -49,6 +51,15 @@ void Quaternion::UpdateByAngularVelocity(const Vector3D& rotation, float duratio
 {
     Quaternion q(0, rotation.x() * duration, rotation.y() * duration, rotation.z() * duration);
     *this = (*this) * q;
+}
+
+Vector3D Quaternion::Euler() const
+{
+    Vector3D result;
+    result.x() = atan2(2 * (w() * x() + y() * z()), 1 - 2 * (x() * x() + y() * y()));
+    result.y() = asin(2 * (w() * y() - z() * x()));
+    result.z() = atan2(2 * (w() * z() + x() * y()), 1 - 2 * (y() * y() + z() * z()));
+    return result;
 }
 
 // x y z w getters

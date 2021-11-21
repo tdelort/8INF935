@@ -78,8 +78,8 @@ void PhysicsEngine::Update(float dt)
     for(auto& particle : instance().particles)
         particle->Integrate(dt);
 
-    //for(auto& rigidBody : instance().rigidBodies)
-    //    rigidBody->Integrate(dt);
+    for(auto& rigidBody : instance().rigidBodies)
+        rigidBody->Integrate(dt);
 
     instance().ResolveCollisions(dt);
 }
@@ -100,7 +100,10 @@ std::vector<RigidBody*> PhysicsEngine::GetRigidBodies()
 // Private functions
 void PhysicsEngine::ResolveForces(float dt)
 {
+    // For particles
     particleForceRegistry.UpdateForce(dt);
+
+    // For rigid bodies
 }
 
 void PhysicsEngine::ResolveCollisions(float dt)

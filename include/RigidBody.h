@@ -34,6 +34,10 @@ class RigidBody
 
     void ClearAccum();
 
+    Vector3D GetPosition() const;
+
+    Vector3D GetRotation() const;
+
     private:
 
     Vector3D worldPosition(const Vector3D& local);

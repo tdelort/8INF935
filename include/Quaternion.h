@@ -20,6 +20,8 @@ public:
 
     void UpdateByAngularVelocity(const Vector3D& rotation, float duration);
 
+    Vector3D Euler() const;
+
     // x y z w getters
     float x() const;
     float y() const;
