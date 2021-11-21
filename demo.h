@@ -24,6 +24,15 @@ class Demo
             RigidBody* rb;
             double startTime;
         } sampleDemo;
+        struct {
+            Cube* car1;
+            RigidBody* rb1;
+            Cube* car2;
+            RigidBody* rb2;
+            double startTime;
+            bool collided;
+            bool started;
+        } collisionDemo;
     } context;
 
     // Cilinder coordinates
@@ -34,6 +43,7 @@ class Demo
         bool follow;
     } camera;
 
+    double lastFrameTime;
     DemoState demoState = DemoState::MENU;
     char* meshPath;
 

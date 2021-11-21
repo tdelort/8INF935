@@ -67,7 +67,7 @@ void Cube::Draw(const glm::mat4& proj, const glm::mat4& view) const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
-    glm::mat4 trans = m_T * m_S * m_R;
+    glm::mat4 trans = m_T * m_R * m_S;
     glUniformMatrix4fv(m_modelUni, 1, GL_FALSE, glm::value_ptr(trans));
     glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));

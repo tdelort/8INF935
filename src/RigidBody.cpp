@@ -28,13 +28,13 @@ void RigidBody::Integrate(float duration)
 
     //Impose Drag 
     m_velocity *= pow(m_damping, duration);
-    //m_rotation *= pow(m_angularDamping, duration) ;
+    m_rotation *= pow(m_angularDamping, duration) ;
 
     //Met a jour la position
     m_position += m_velocity * duration;
     m_orientation.UpdateByAngularVelocity(m_rotation, duration); 
     // Normalise the orientation, and update the matrice
-    //calculateWorldLocalData();
+	CalculateDerivedData();
     // Clear accumulators.
     ClearAccum();
 }
@@ -46,7 +46,7 @@ void RigidBody::AddForce(const Vector3D& force)
 void RigidBody::AddForceAtPoint(const Vector3D& force, const Vector3D& pointMonde)
 {
     AddForce(force);
-    m_torqueAccum += (m_position - pointMonde).cross(force);
+    m_torqueAccum += Vector3D::cross(pointMonde - m_position, force);
 }
 
 void RigidBody::AddForceAtBodyPoint(const Vector3D& force, const Vector3D& pointLocal)
@@ -74,7 +74,7 @@ Vector3D RigidBody::GetRotation() const
 
 Vector3D RigidBody::WorldPosition(const Vector3D& local)    
 {
-    return m_transformMatrix.Inverse()*local;
+    return m_transformMatrix * local;
 }
 
 void RigidBody::CalculateDerivedData()
@@ -85,6 +85,7 @@ void RigidBody::CalculateDerivedData()
 
 void RigidBody::ComputeTenseurInertiaWorld(Matrix3x3& inertiaTenseurWorld)
 {
+    // I-1' = Mb I-1 Mb-1
 	Matrix3x3 transformMatrix3x3 = m_transformMatrix.ToMatrix3x3();
 	m_inverseInertiaTensorWold = transformMatrix3x3 * m_invTenseurInertie;
 	m_inverseInertiaTensorWold = m_inverseInertiaTensorWold * transformMatrix3x3.Inverse();

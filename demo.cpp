@@ -94,7 +94,19 @@ void Demo::CameraControls()
     }
     else if (demoState == DemoState::COLLISION_DEMO)
     {
-
+        ImGui::Checkbox("Follow Mesh", &camera.follow);
+        if (camera.follow)
+        {
+            camera.target.x = context.collisionDemo.rb1->GetPosition().x();
+            camera.target.y = context.collisionDemo.rb1->GetPosition().y();
+            camera.target.z = context.collisionDemo.rb1->GetPosition().z();
+        }
+        else
+        {
+            ImGui::SliderFloat("Target x", &camera.target.x, -10, 10);
+            ImGui::SliderFloat("Target y", &camera.target.y, -10, 10);
+            ImGui::SliderFloat("Target z", &camera.target.z, -10, 10);
+        }
     }
     else // DemoState::MENU
     {
@@ -142,6 +154,15 @@ void Demo::ImguiCollisionDemo()
     ImGui::NewFrame();
     ImGui::Begin("Collision Demo", 0, ImGuiWindowFlags_AlwaysAutoResize);
     CameraControls();
+    if(!context.collisionDemo.started)
+    {
+        if (ImGui::Button("Start"))
+        {
+            context.collisionDemo.started = true;
+            lastFrameTime = glfwGetTime();
+            context.collisionDemo.startTime = glfwGetTime();
+        }
+    }
     if (ImGui::Button("Back"))
         demoState = DemoState::MENU;
     ImGui::End();
@@ -159,6 +180,10 @@ void Demo::ClearContext(DemoState oldState)
         delete context.sampleDemo.rb;
         break;
     case DemoState::COLLISION_DEMO:
+        delete context.collisionDemo.car1;
+        delete context.collisionDemo.car2;
+        delete context.collisionDemo.rb1;
+        delete context.collisionDemo.rb2;
         break;
     default:
         break;
@@ -176,8 +201,8 @@ void Demo::run()
     Gui* gui = new Gui();
     Grid grid(Grid::CreateProgram());
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
-    camera = {0.0, 5.0, 1.0, glm::vec3(0.0, 0.0, 0.0), false};
-    double lastFrameTime = glfwGetTime();
+    camera = {3.14 * 0.5, 5.0, 2.5, glm::vec3(0.0, 0.0, 0.0), false};
+    lastFrameTime = glfwGetTime();
 
 	while(gui->isOpen())
     {
@@ -217,19 +242,15 @@ void Demo::run()
                 RigidBody* rb = new RigidBody(
                     Vector3D(0, 0, 0),
                     Quaternion(1, 0, 0, 0),
-                    1.0f,
-                    0.99f,
-                    0.99f,
-                    {{0.4, 0, 0},
-                    {0, 0.4, 0},
-                    {0, 0, 0.4}}
+                    1.0f, 0.99f, 0.99f,
+                    {{0.4, 0, 0}, {0, 0.4, 0}, {0, 0, 0.4}}
                 );
 
                 ObjMesh* mesh = new ObjMesh(createProgram(), meshPath);
                 mesh->SetScale(glm::vec3(0.3f));
                 mesh->SetColor(glm::vec3(1.0f));
                 mesh->SetPosition(glm::vec3(0, 0, 0));
-                mesh->SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
+                mesh->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
                 context.sampleDemo.rb = rb;
                 context.sampleDemo.mesh = mesh;
@@ -240,6 +261,45 @@ void Demo::run()
             else if (demoState == DemoState::COLLISION_DEMO)
             {
                 std::cout << "Collision Demo" << std::endl;
+
+                Vector3D pos1(2, 0, 0.25);
+                RigidBody* rb1 = new RigidBody( 
+                    pos1,
+                    Quaternion(1, 0, 0, 0),
+                    1.0f, 0.99f, 0.99f,
+                    {{0.4, 0, 0}, {0, 0.4, 0}, {0, 0, 0.4}}
+                );
+
+                Cube* cube1 = new Cube(createProgram());
+                cube1->SetScale(glm::vec3(1.0f, 0.2f, 0.5f));
+                cube1->SetColor(glm::vec3(7.0f, 1.0f, 1.0f));
+                cube1->SetPosition(glm::vec3(pos1.x(), pos1.y(), pos1.z()));
+                cube1->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+
+                Vector3D pos2(-2, 0, 0);
+                RigidBody* rb2 = new RigidBody(
+                    pos2,
+                    Quaternion(1, 0, 0, 0),
+                    4.0f, 0.99f, 0.99f,
+                    {{0.4, 0, 0}, {0, 0.4, 0}, {0, 0, 0.4}}
+                );
+
+                Cube* cube2 = new Cube(createProgram());
+                cube2->SetScale(glm::vec3(1.0f, 0.4f, 0.5f));
+                cube2->SetColor(glm::vec3(1.0f, 7.0f, 7.0f));
+                cube2->SetPosition(glm::vec3(pos2.x(), pos2.y(), pos2.z()));
+                cube2->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+
+                context.collisionDemo.car1 = cube1;
+                context.collisionDemo.rb1 = rb1;
+                context.collisionDemo.car2 = cube2;
+                context.collisionDemo.rb2 = rb2;
+                context.collisionDemo.startTime = glfwGetTime();
+                context.collisionDemo.collided = false;
+                context.collisionDemo.started = false;
+
+                PhysicsEngine::AddRigidBody(rb1);
+                PhysicsEngine::AddRigidBody(rb2);
             }
             lastFrameTime = glfwGetTime();
             // clear PhysicsEngine
@@ -265,8 +325,7 @@ void Demo::run()
             double currentTime = glfwGetTime();
             if (currentTime - context.sampleDemo.startTime < 0.2f)
             { 
-                std::cout << "Time : " << currentTime - context.sampleDemo.startTime << std::endl;
-                context.sampleDemo.rb->AddForceAtPoint(Vector3D(0, 5, 0), Vector3D(0, 1, 1));
+                context.sampleDemo.rb->AddForceAtPoint(Vector3D(0, 5, 0), Vector3D(1, 0, 0));
             }
 
 
@@ -274,9 +333,6 @@ void Demo::run()
             double deltaTime = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
             PhysicsEngine::Update(deltaTime);
-
-            //std::cout << "deltaTime : " << deltaTime << std::endl;
-            //std::cout << "fps : " << 1 / deltaTime << std::endl;
 
             // ################## GRAPHICS ###################
             Vector3D r = context.sampleDemo.rb->GetRotation();
@@ -287,7 +343,45 @@ void Demo::run()
         }
         else if (demoState == DemoState::COLLISION_DEMO)
         {
-            //mesh2.Draw(proj, view);
+            if(context.collisionDemo.started)
+            {
+                double currentTime = glfwGetTime();
+                Vector3D pos1 = context.collisionDemo.rb1->GetPosition();
+                Vector3D pos2 = context.collisionDemo.rb2->GetPosition();
+                if (currentTime - context.collisionDemo.startTime < 0.1f)
+                { 
+                    context.collisionDemo.rb1->AddForce(Vector3D(-30, 0, 0));
+                    context.collisionDemo.rb2->AddForce(Vector3D(30, 0, 0));
+                }
+                else if (!context.collisionDemo.collided && abs(pos1.x() - pos2.x()) < 1.0f)
+                {
+                    context.collisionDemo.collided = true;
+                    float intensity = 30.0f * 1.5f * (1.0f / 0.1f);
+                    Vector3D dir = pos2 - pos1;
+                    dir.normalize();
+                    Vector3D force = dir * intensity;
+                    context.collisionDemo.rb1->AddForceAtBodyPoint(-force, Vector3D( 0.5, 0, -0.125));
+                    context.collisionDemo.rb2->AddForceAtBodyPoint(force, Vector3D(-0.5, 0, 0.125));
+                }
+            }
+            // ################### PHYSICS ###################
+            double deltaTime = glfwGetTime() - lastFrameTime;
+            lastFrameTime = glfwGetTime();
+            PhysicsEngine::Update(deltaTime);
+
+            // ################## GRAPHICS ###################
+            Vector3D r = context.collisionDemo.rb1->GetRotation();
+            Vector3D v = context.collisionDemo.rb1->GetPosition();
+            context.collisionDemo.car1->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+            context.collisionDemo.car1->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+            r = context.collisionDemo.rb2->GetRotation();
+            v = context.collisionDemo.rb2->GetPosition();
+            context.collisionDemo.car2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+            context.collisionDemo.car2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+            context.collisionDemo.car1->Draw(proj, view);
+            context.collisionDemo.car2->Draw(proj, view);
         }
 
         grid.Draw(proj, view);
