@@ -21,13 +21,14 @@ class RigidBody
     Matrix3x4 m_transformMatrix;
 
     Matrix3x3 m_invTenseurInertie;
-    Matrix3x3 m_invTenseurInertieWorld;
 
     Vector3D m_forceAccum;
 
     Vector3D m_torqueAccum;
 
     public:
+
+    Rigidbody(Vector3D position, Quaternion orientation, float mass, float damping, float angularDamping, Matrix3x3 tenseurInertie);
 
     void Integrate(float duration);
 
@@ -42,5 +43,7 @@ class RigidBody
     private:
 
     Vector3D WorldPosition(const Vector3D& local);
+    void CalculateDerivedData();
+    void ComputeTenseurInertiaWorld(Matrix33 &inertiaTenseur);
     
 };

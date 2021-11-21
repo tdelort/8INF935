@@ -63,7 +63,7 @@ Vector3D RigidBody::WorldPosition(const Vector3D& local)
 void RigidBody::CalculateDerivedData()
 {
     m_transformMatrix.SetOrientationAndPosition(m_orientation, m_position);
-    // ComputeTenseurInertiaWorld(m_invTenseurInertie)
+    // ComputeTenseurInertiaWorld(m_invTenseurInertie);
 }
 
 void Rigidbody::ComputeTenseurInertiaWorld(Matrix3x3& inertiaTenseurWorld)
