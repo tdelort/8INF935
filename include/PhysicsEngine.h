@@ -8,6 +8,7 @@
 #include "particle_forces/ParticleForceRegistry.h"
 #include "particle_forces/ParticleForceGenerator.h"
 #include "particle_contacts/ParticleContactGenerator.h"
+#include "particle_contacts/ParticleContactResolver.h"
 
 class  PhysicsEngine
 {

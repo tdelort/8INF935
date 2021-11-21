@@ -1,13 +1,19 @@
 #include "RigidBody.h"
+
+#include "Vector3D.h"
+#include "Quaternion.h"
+#include "Matrix3x4.h"
+#include "Matrix3x3.h"
+
 #include <corecrt_math.h>
 #include <math.h>
 
-Rigidbody::Rigidbody(Vector3D position, Quaternion orientation, float mass, float damping, float angularDamping, Matrix33 tenseurInertie) : 
-	m_position(position), m_orientation(orientation), m_inverseMass(1/mass), m_damping(damping), m_angularDamping(angularDamping),
+RigidBody::RigidBody(Vector3D position, Quaternion orientation, float mass, float damping, float angularDamping, Matrix3x3 tenseurInertie)
+	: m_position(position), m_orientation(orientation), m_invMass(1/mass), m_damping(damping), m_angularDamping(angularDamping),
 	m_forceAccum(Vector3D(0,0,0)), m_torqueAccum(Vector3D(0,0,0))
 {
-	CalculateDerivedData();
 	m_invTenseurInertie = tenseurInertie.Inverse();
+	CalculateDerivedData();
 }
 
 void RigidBody::Integrate(float duration)
@@ -21,14 +27,14 @@ void RigidBody::Integrate(float duration)
     m_rotation += _angularAccel * duration;
 
     //Impose Drag 
-    m_velocity *= pow(m_damping, duration) 
-    m_rotation *= pow(m_amgularDamping, duration) ;
+    m_velocity *= pow(m_damping, duration);
+    //m_rotation *= pow(m_angularDamping, duration) ;
 
     //Met a jour la position
     m_position += m_velocity * duration;
     m_orientation.UpdateByAngularVelocity(m_rotation, duration); 
     // Normalise the orientation, and update the matrice
-    calculateWorldLocalData();
+    //calculateWorldLocalData();
     // Clear accumulators.
     ClearAccum();
 }
@@ -40,7 +46,7 @@ void RigidBody::AddForce(const Vector3D& force)
 void RigidBody::AddForceAtPoint(const Vector3D& force, const Vector3D& pointMonde)
 {
     AddForce(force);
-    m_torqueAccum += (m_position - pointMonde).dot(force);
+    m_torqueAccum += (m_position - pointMonde).cross(force);
 }
 
 void RigidBody::AddForceAtBodyPoint(const Vector3D& force, const Vector3D& pointLocal)
@@ -53,6 +59,7 @@ void RigidBody::ClearAccum()
 {
     m_forceAccum = Vector3D(0,0,0);
     m_torqueAccum = Vector3D(0,0,0);
+    m_orientation.Normalize();
 }
 
 Vector3D RigidBody::GetPosition() const
@@ -73,12 +80,12 @@ Vector3D RigidBody::WorldPosition(const Vector3D& local)
 void RigidBody::CalculateDerivedData()
 {
     m_transformMatrix.SetOrientationAndPosition(m_orientation, m_position);
-    // ComputeTenseurInertiaWorld(m_invTenseurInertie);
+    ComputeTenseurInertiaWorld(m_invTenseurInertie);
 }
 
-void Rigidbody::ComputeTenseurInertiaWorld(Matrix3x3& inertiaTenseurWorld)
+void RigidBody::ComputeTenseurInertiaWorld(Matrix3x3& inertiaTenseurWorld)
 {
-	// Matrix3x3 transformMatrix3x3 = m_transformMatrix.ToMatrix3x3();
-	// inertiaTenseurWorld = transformMatrix3x3 * m_invTenseurInertie;
-	// inertiaTenseurWorld *= transformMatrix3x3.Inverse();
+	Matrix3x3 transformMatrix3x3 = m_transformMatrix.ToMatrix3x3();
+	m_inverseInertiaTensorWold = transformMatrix3x3 * m_invTenseurInertie;
+	m_inverseInertiaTensorWold = m_inverseInertiaTensorWold * transformMatrix3x3.Inverse();
 }

@@ -30,6 +30,7 @@
 #include <Grid.h>
 #include <Shader.h>
 #include <RigidBody.h>
+#include <PhysicsEngine.h>
 
 GLuint createProgram()
 {
@@ -124,10 +125,19 @@ void Demo::run()
     mesh.SetPosition(glm::vec3(0, 0, 0));
     mesh.SetRotation(glm::vec3(0.0f, 30.0f, 0.0f));
 
-    RigidBody rb = new RigidBody();
-    rb.AddForce(glm::vec3(0, -9.81f, 0));
+    RigidBody* rb = new RigidBody(
+        Vector3D(0, 0, 0),
+        Quaternion(1, 0, 0, 0),
+        1.0f,
+        0.99f,
+        0.99f,
+        {{0.4, 0, 0},
+         {0, 0.4, 0},
+         {0, 0, 0.4}}
+    );
+    rb->AddForceAtPoint(Vector3D(0, 10, 0), Vector3D(0, 0, 1));
 
-    PhysicsEngine::AddRigidBody(&rb);
+    PhysicsEngine::AddRigidBody(rb);
 
     ObjMesh mesh2(createProgram(), meshPath);
     mesh2.SetScale(glm::vec3(0.3f));

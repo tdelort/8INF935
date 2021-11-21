@@ -11,8 +11,7 @@ Quaternion::Quaternion()
 Quaternion::Quaternion(float w, float x, float y, float z)
     : value{w, x, y, z}
 { 
-    // TODO : Check quaternion is valid
-    Normalize();
+
 }
 
 void Quaternion::Normalize()
@@ -23,11 +22,11 @@ void Quaternion::Normalize()
         std::cerr << "Quaternion::Normalize() : Quaternion is zero" << std::endl;
         exit(1);
     }
-    length = 1.0f / length;
-    value[0] *= length;
-    value[1] *= length;
-    value[2] *= length;
-    value[3] *= length;
+    float invlength = 1.0f / length;
+    value[0] *= invlength;
+    value[1] *= invlength;
+    value[2] *= invlength;
+    value[3] *= invlength;
 }
 
 Quaternion Quaternion::operator*(const Quaternion& other)
@@ -37,28 +36,35 @@ Quaternion Quaternion::operator*(const Quaternion& other)
     result.x() = w() * other.x() + x() * other.w() + y() * other.z() - z() * other.y();
     result.y() = w() * other.y() + y() * other.w() + z() * other.x() - x() * other.z();
     result.z() = w() * other.z() + z() * other.w() + x() * other.y() - y() * other.x();
-    result.Normalize();
     return result;
 }
 
 void Quaternion::RotateByVector(const Vector3D& vector)
 {
-    Quaternion q(0, vector.x(), vector.y(), vector.z());
-    *this = (*this) * q;
 }
 
 void Quaternion::UpdateByAngularVelocity(const Vector3D& rotation, float duration)
 {
-    Quaternion q(0, rotation.x() * duration, rotation.y() * duration, rotation.z() * duration);
-    *this = (*this) * q;
+    Quaternion omega(
+        0.0f,
+        rotation.x(),
+        rotation.y(),
+        rotation.z()
+    );
+    //std::cout << "tmp : " << tmp.w() << " " << tmp.x() << " " << tmp.y() << " " << tmp.z() << std::endl;
+    Quaternion tmp = omega * *this;
+    w() = w() + 0.5f * duration * tmp.w();
+    x() = x() + 0.5f * duration * tmp.x();
+    y() = y() + 0.5f * duration * tmp.y();
+    z() = z() + 0.5f * duration * tmp.z();
 }
 
 Vector3D Quaternion::Euler() const
 {
     Vector3D result;
-    result.x() = atan2(2 * (w() * x() + y() * z()), 1 - 2 * (x() * x() + y() * y()));
-    result.y() = asin(2 * (w() * y() - z() * x()));
-    result.z() = atan2(2 * (w() * z() + x() * y()), 1 - 2 * (y() * y() + z() * z()));
+    result.setX(atan2(2 * (w() * x() + y() * z()), 1 - 2 * (x() * x() + y() * y())));
+    result.setY(asin(2 * (w() * y() - z() * x())));
+    result.setZ(atan2(2 * (w() * z() + x() * y()), 1 - 2 * (y() * y() + z() * z())));
     return result;
 }
 

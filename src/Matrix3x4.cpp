@@ -103,3 +103,13 @@ Vector3D Matrix3x4::TransformDirection(const Vector3D& vector)
 
     return tmp * vector;
 }
+
+Matrix3x3 Matrix3x4::ToMatrix3x3() const
+{
+    Matrix3x3 res = {
+        {m_data[0], m_data[1], m_data[2]},
+        {m_data[4], m_data[5], m_data[6]},
+        {m_data[8], m_data[9], m_data[10]}
+    };
+    return res;
+}

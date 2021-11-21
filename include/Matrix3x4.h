@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Matrix.h"
+#include "Matrix3x3.h"
 #include <initializer_list>
 
 class Quaternion;
@@ -22,4 +23,6 @@ public:
 
     Vector3D TransformPosition(const Vector3D& vector);
     Vector3D TransformDirection(const Vector3D& vector);
+
+    Matrix3x3 ToMatrix3x3() const;
 };
