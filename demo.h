@@ -6,6 +6,9 @@
 #include <Cube.h>
 #include <ObjMesh.h>
 #include <Grid.h>
+#include <RigidBody.h>
+
+#include <glm/glm.hpp>
 
 class Demo
 {
@@ -15,17 +18,32 @@ class Demo
         COLLISION_DEMO
     };
 
+    union DemoContext {
+        struct {
+            ObjMesh* mesh;
+            RigidBody* rb;
+            double startTime;
+        } sampleDemo;
+    } context;
+
+    // Cilinder coordinates
+    struct Camera {
+        float theta;
+        float radius, height;
+        glm::vec3 target;
+        bool follow;
+    } camera;
+
     DemoState demoState = DemoState::MENU;
-
-    ImVec4 clear_color;
-
     char* meshPath;
 
-    float r;
-
+    void CameraControls();
     void ImguiMenu();
     void ImguiSampleDemo();
     void ImguiCollisionDemo();
+
+    void ClearContext(DemoState oldState);
+
 public:
     Demo(char *path);
     void run();

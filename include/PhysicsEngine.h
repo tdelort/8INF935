@@ -44,6 +44,8 @@ public:
 
     static void Update(float dt);
 
+    static void Clear();
+
     static std::vector<Particle*> GetParticles();
     static std::vector<RigidBody*> GetRigidBodies();
 };
@@ -85,6 +87,14 @@ void PhysicsEngine::Update(float dt)
     instance().ResolveCollisions(dt);
 }
 
+void PhysicsEngine::Clear()
+{
+    // No delete
+    instance().particles.clear();
+    instance().particleForceRegistry = ParticleForceRegistry();
+    instance().particleContactGenerators.clear();
+    instance().rigidBodies.clear();
+}
 
 // Get things
 std::vector<Particle*> PhysicsEngine::GetParticles()
