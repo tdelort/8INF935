@@ -3,11 +3,13 @@
 #include "Vector3D.h"
 #include "Quaternion.h"
 #include "Matrix3x4.h"
+#include "Matrix3x3.h"
 
 class RigidBody
 {
     private:
     float m_invMass;
+    float m_damping;
     float m_angularDamping;
     Vector3D m_velocity;
     Vector3D m_position;
@@ -18,11 +20,15 @@ class RigidBody
 
     Matrix3x4 m_transformMatrix;
 
+    Matrix3x3 m_invTenseurInertie;
+
     Vector3D m_forceAccum;
 
     Vector3D m_torqueAccum;
 
     public:
+
+    Rigidbody(Vector3D position, Quaternion orientation, float mass, float damping, float angularDamping, Matrix3x3 tenseurInertie);
 
     void Integrate(float duration);
 
@@ -40,6 +46,8 @@ class RigidBody
 
     private:
 
-    Vector3D worldPosition(const Vector3D& local);
+    Vector3D WorldPosition(const Vector3D& local);
+    void CalculateDerivedData();
+    void ComputeTenseurInertiaWorld(Matrix33 &inertiaTenseur);
     
 };
