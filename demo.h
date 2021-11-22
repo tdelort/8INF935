@@ -49,6 +49,9 @@ class Demo
         bool follow;
     } camera;
 
+    glm::mat4 view;
+    glm::mat4 proj;
+
     double lastFrameTime;
     DemoState demoState = DemoState::MENU;
     char* meshPath;
@@ -61,6 +64,9 @@ class Demo
 
     void ClearContext(DemoState oldState);
 
+    void SampleDemo();
+    void CollisionDemo();
+    void SpringDemo();
 public:
     Demo(char *path);
     void run();

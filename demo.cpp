@@ -380,7 +380,7 @@ void Demo::run()
         }
 
         gui->clear(clear_color);
-        glm::mat4 view = glm::lookAt(
+        view = glm::lookAt(
             glm::vec3(camera.radius * cos(camera.theta), camera.height, camera.radius * sin(camera.theta)),
             camera.target,
             glm::vec3(0.0f, 1.0f, 0.0f)
@@ -388,7 +388,7 @@ void Demo::run()
 
         int width, height;
         glfwGetWindowSize(gui->GetWindow(), &width, &height);
-        glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
+        proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
 
         if (demoState == DemoState::MENU)
         {
@@ -396,93 +396,108 @@ void Demo::run()
         }
         else if (demoState == DemoState::SAMPLE_DEMO)
         {
-            Vector3D pos = context.sampleDemo.rb->GetPosition();
-            if (pos.y() < 0.0f)
-            {
-                float intensity = 50 * (1 / 0.1f); // Impulse
-                Vector3D point = Vector3D(frand(-1, 1), 0.0f, frand(-1, 1));
-                context.sampleDemo.rb->AddForceAtPoint(Vector3D(0, intensity, 0), point);
-            }
-
-
-            // ################### PHYSICS ###################
-            double deltaTime = glfwGetTime() - lastFrameTime;
-            lastFrameTime = glfwGetTime();
-            PhysicsEngine::Update(deltaTime);
-
-            // ################## GRAPHICS ###################
-            Vector3D r = context.sampleDemo.rb->GetRotation();
-            Vector3D v = context.sampleDemo.rb->GetPosition();
-            context.sampleDemo.mesh->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
-            context.sampleDemo.mesh->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
-            context.sampleDemo.mesh->Draw(proj, view);
+            SampleDemo();
         }
         else if (demoState == DemoState::COLLISION_DEMO)
         {
-            if(context.collisionDemo.started)
-            {
-                double currentTime = glfwGetTime();
-                Vector3D pos1 = context.collisionDemo.rb1->GetPosition();
-                Vector3D pos2 = context.collisionDemo.rb2->GetPosition();
-                if (currentTime - context.collisionDemo.startTime < 0.1f)
-                { 
-                    context.collisionDemo.rb1->AddForce(Vector3D(-30, 0, 0));
-                    context.collisionDemo.rb2->AddForce(Vector3D(30, 0, 0));
-                }
-                else if (!context.collisionDemo.collided && abs(pos1.x() - pos2.x()) < 1.0f)
-                {
-                    context.collisionDemo.collided = true;
-                    float intensity = 30.0f * 1.5f * (1.0f / 0.1f);
-                    Vector3D dir = pos2 - pos1;
-                    dir.normalize();
-                    Vector3D force = dir * intensity;
-                    context.collisionDemo.rb1->AddForceAtBodyPoint(-force, Vector3D( 0.5, 0, -0.125));
-                    context.collisionDemo.rb2->AddForceAtBodyPoint(force, Vector3D(-0.5, 0, 0.125));
-                }
-            }
-            // ################### PHYSICS ###################
-            double deltaTime = glfwGetTime() - lastFrameTime;
-            lastFrameTime = glfwGetTime();
-            PhysicsEngine::Update(deltaTime);
-
-            // ################## GRAPHICS ###################
-            Vector3D r = context.collisionDemo.rb1->GetRotation();
-            Vector3D v = context.collisionDemo.rb1->GetPosition();
-            context.collisionDemo.car1->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
-            context.collisionDemo.car1->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
-
-            r = context.collisionDemo.rb2->GetRotation();
-            v = context.collisionDemo.rb2->GetPosition();
-            context.collisionDemo.car2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
-            context.collisionDemo.car2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
-
-            context.collisionDemo.car1->Draw(proj, view);
-            context.collisionDemo.car2->Draw(proj, view);
+            CollisionDemo();
         }
         else if (demoState == DemoState::SPRING_DEMO)
         {
-            // ################### PHYSICS ###################
-            double deltaTime = glfwGetTime() - lastFrameTime;
-            lastFrameTime = glfwGetTime();
-            PhysicsEngine::Update(deltaTime);
-
-            // ################## GRAPHICS ###################
-            Vector3D r = context.springDemo.rb1->GetRotation();
-            Vector3D v = context.springDemo.rb1->GetPosition();
-            context.springDemo.mesh1->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
-            context.springDemo.mesh1->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
-
-            r = context.springDemo.rb2->GetRotation();
-            v = context.springDemo.rb2->GetPosition();
-            context.springDemo.mesh2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
-            context.springDemo.mesh2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
-
-            context.springDemo.mesh1->Draw(proj, view);
-            context.springDemo.mesh2->Draw(proj, view);
+            SpringDemo();
         }
 
         grid.Draw(proj, view);
 
         gui->swapBuffers();
     }
+}
+
+void Demo::SampleDemo()
+{
+    Vector3D pos = context.sampleDemo.rb->GetPosition();
+    if (pos.y() < 0.0f)
+    {
+        float intensity = 50 * (1 / 0.1f); // Impulse
+        Vector3D point = Vector3D(frand(-1, 1), 0.0f, frand(-1, 1));
+        context.sampleDemo.rb->AddForceAtPoint(Vector3D(0, intensity, 0), point);
+    }
+
+
+    // ################### PHYSICS ###################
+    double deltaTime = glfwGetTime() - lastFrameTime;
+    lastFrameTime = glfwGetTime();
+    PhysicsEngine::Update(deltaTime);
+
+    // ################## GRAPHICS ###################
+    Vector3D r = context.sampleDemo.rb->GetRotation();
+    Vector3D v = context.sampleDemo.rb->GetPosition();
+    context.sampleDemo.mesh->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+    context.sampleDemo.mesh->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+    context.sampleDemo.mesh->Draw(proj, view);
+}
+
+void Demo::CollisionDemo()
+{
+    if(context.collisionDemo.started)
+    {
+        double currentTime = glfwGetTime();
+        Vector3D pos1 = context.collisionDemo.rb1->GetPosition();
+        Vector3D pos2 = context.collisionDemo.rb2->GetPosition();
+        if (currentTime - context.collisionDemo.startTime < 0.1f)
+        { 
+            context.collisionDemo.rb1->AddForce(Vector3D(-30, 0, 0));
+            context.collisionDemo.rb2->AddForce(Vector3D(30, 0, 0));
+        }
+        else if (!context.collisionDemo.collided && abs(pos1.x() - pos2.x()) < 1.0f)
+        {
+            context.collisionDemo.collided = true;
+            float intensity = 30.0f * 1.5f * (1.0f / 0.1f);
+            Vector3D dir = pos2 - pos1;
+            dir.normalize();
+            Vector3D force = dir * intensity;
+            context.collisionDemo.rb1->AddForceAtBodyPoint(-force, Vector3D( 0.5, 0, -0.125));
+            context.collisionDemo.rb2->AddForceAtBodyPoint(force, Vector3D(-0.5, 0, 0.125));
+        }
+    }
+    // ################### PHYSICS ###################
+    double deltaTime = glfwGetTime() - lastFrameTime;
+    lastFrameTime = glfwGetTime();
+    PhysicsEngine::Update(deltaTime);
+
+    // ################## GRAPHICS ###################
+    Vector3D r = context.collisionDemo.rb1->GetRotation();
+    Vector3D v = context.collisionDemo.rb1->GetPosition();
+    context.collisionDemo.car1->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+    context.collisionDemo.car1->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+    r = context.collisionDemo.rb2->GetRotation();
+    v = context.collisionDemo.rb2->GetPosition();
+    context.collisionDemo.car2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+    context.collisionDemo.car2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+    context.collisionDemo.car1->Draw(proj, view);
+    context.collisionDemo.car2->Draw(proj, view);
+}
+
+void Demo::SpringDemo()
+{
+    // ################### PHYSICS ###################
+    double deltaTime = glfwGetTime() - lastFrameTime;
+    lastFrameTime = glfwGetTime();
+    PhysicsEngine::Update(deltaTime);
+
+    // ################## GRAPHICS ###################
+    Vector3D r = context.springDemo.rb1->GetRotation();
+    Vector3D v = context.springDemo.rb1->GetPosition();
+    context.springDemo.mesh1->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+    context.springDemo.mesh1->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+    r = context.springDemo.rb2->GetRotation();
+    v = context.springDemo.rb2->GetPosition();
+    context.springDemo.mesh2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+    context.springDemo.mesh2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+    context.springDemo.mesh1->Draw(proj, view);
+    context.springDemo.mesh2->Draw(proj, view);
 }
