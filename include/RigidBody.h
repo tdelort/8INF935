@@ -46,9 +46,11 @@ class RigidBody
 
     Vector3D GetRotation() const;
 
-    private:
+    float GetInvMass() const;
 
     Vector3D WorldPosition(const Vector3D& local);
+
+    private:
     void CalculateDerivedData();
     void ComputeTenseurInertiaWorld(Matrix3x3 &inertiaTenseur);
     

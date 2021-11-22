@@ -15,14 +15,14 @@ class Demo
     enum class DemoState {
         MENU,
         SAMPLE_DEMO,
-        COLLISION_DEMO
+        COLLISION_DEMO,
+        SPRING_DEMO
     };
 
     union DemoContext {
         struct {
             ObjMesh* mesh;
             RigidBody* rb;
-            double startTime;
         } sampleDemo;
         struct {
             Cube* car1;
@@ -33,6 +33,12 @@ class Demo
             bool collided;
             bool started;
         } collisionDemo;
+        struct {
+            ObjMesh* mesh1;
+            RigidBody* rb1;
+            ObjMesh* mesh2;
+            RigidBody* rb2;
+        } springDemo;
     } context;
 
     // Cilinder coordinates
@@ -51,6 +57,7 @@ class Demo
     void ImguiMenu();
     void ImguiSampleDemo();
     void ImguiCollisionDemo();
+    void ImguiSpringDemo();
 
     void ClearContext(DemoState oldState);
 

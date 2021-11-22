@@ -4,11 +4,13 @@
 #include <iostream>
 
 #include "Particle.h"
-#include "RigidBody.h"
 #include "particle_forces/ParticleForceRegistry.h"
 #include "particle_forces/ParticleForceGenerator.h"
 #include "particle_contacts/ParticleContactGenerator.h"
 #include "particle_contacts/ParticleContactResolver.h"
+
+#include "RigidBody.h"
+#include "rigidbody_forces/RigidBodyForceRegistry.h"
 
 class  PhysicsEngine
 {
@@ -19,6 +21,8 @@ private:
     ParticleContactResolver particleContactResolver;
 
     std::vector<RigidBody*> rigidBodies;
+    RigidBodyForceRegistry rigidBodyForceRegistry;
+
 
     void ResolveForces(float dt);
     void ResolveCollisions(float dt);
@@ -38,9 +42,11 @@ public:
     }
 
     static void AddParticle(Particle* particle);
-    static void AddRigidBody(RigidBody* rigidBody);
     static void AddParticleForceGenerator(Particle* p, ParticleForceGenerator* particleForceGenerator);
     static void AddParticleContactGenerator(ParticleContactGenerator* particleContactGenerator);
+
+    static void AddRigidBody(RigidBody* rigidBody);
+    static void AddRigidBodyForceGenerator(RigidBody* rb, ForceGenerator* forceGenerator);
 
     static void Update(float dt);
 
@@ -71,6 +77,10 @@ void PhysicsEngine::AddParticleContactGenerator(ParticleContactGenerator* partic
     instance().particleContactGenerators.push_back(particleContactGenerator);
 }
 
+void PhysicsEngine::AddRigidBodyForceGenerator(RigidBody* rb, ForceGenerator* forceGenerator)
+{
+    instance().rigidBodyForceRegistry.AddEntry(rb, forceGenerator);
+}
 
 // Update things
 void PhysicsEngine::Update(float dt)
@@ -94,6 +104,7 @@ void PhysicsEngine::Clear()
     instance().particleForceRegistry = ParticleForceRegistry();
     instance().particleContactGenerators.clear();
     instance().rigidBodies.clear();
+    instance().rigidBodyForceRegistry = RigidBodyForceRegistry();
 }
 
 // Get things
@@ -115,6 +126,7 @@ void PhysicsEngine::ResolveForces(float dt)
     particleForceRegistry.UpdateForce(dt);
 
     // For rigid bodies
+    rigidBodyForceRegistry.UpdateForce(dt);
 }
 
 void PhysicsEngine::ResolveCollisions(float dt)

@@ -5,5 +5,5 @@
 class ForceGenerator
 {
     public: 
-    virtual void UpdateForce (RigidBody* rigidBody) = 0;
+    virtual void UpdateForce (RigidBody* rigidBody, float duration) = 0;
 };

@@ -1,11 +1,19 @@
-#include "../../include/forces/GravityForceGenerator.h"
-#include "../../include/RigidBody.h"
-#include "../../include/Vector3D.h"
+#include "rigidbody_forces/SpringForceGenerator.h"
+#include "RigidBody.h"
+#include "Vector3D.h"
 
-void ParticleSpring::UpdateForce(RigidBody* rigidbody)
+SpringForceGenerator::SpringForceGenerator(RigidBody* otherRigidBody, Vector3D otherBodyAnchor, Vector3D bodyAnchor, float k, float restingLength)
+    : m_otherRigidBody(otherRigidBody), m_otherBodyAnchor(otherBodyAnchor), m_bodyAnchor(bodyAnchor), m_k(k), m_restingLength(restingLength)
+{ }
+
+void SpringForceGenerator::UpdateForce(RigidBody* rigidbody, float duration)
 {
-    Vector3D d = rigidbody->position() - m_otherRigidBody->position();
+    Vector3D worldP1 = rigidbody->WorldPosition(m_bodyAnchor);
+    Vector3D worldP2 = m_otherRigidBody->WorldPosition(m_otherBodyAnchor);
+
+    Vector3D d = worldP1 - worldP2;
     Vector3D F = -m_k * (d.norm() - m_restingLength) * d.normalize();
-    RigidBody->AddForce(F);
-    m_otherRigidBody->AddForce(-F);
+
+    rigidbody->AddForceAtBodyPoint(F, m_bodyAnchor);
+    m_otherRigidBody->AddForceAtBodyPoint(-F, m_otherBodyAnchor);
 }

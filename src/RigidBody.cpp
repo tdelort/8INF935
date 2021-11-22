@@ -72,6 +72,11 @@ Vector3D RigidBody::GetRotation() const
     return m_orientation.Euler();
 }
 
+float RigidBody::GetInvMass() const
+{
+    return m_invMass;
+}
+
 Vector3D RigidBody::WorldPosition(const Vector3D& local)    
 {
     return m_transformMatrix * local;

@@ -31,6 +31,14 @@
 #include <Shader.h>
 #include <RigidBody.h>
 #include <PhysicsEngine.h>
+#include <rigidbody_forces/GravityForceGenerator.h>
+#include <rigidbody_forces/SpringForceGenerator.h>
+#include <rigidbody_forces/AnchoredSpringForceGenerator.h>
+
+inline float frand(int lo, int hi)
+{
+    return lo + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(hi-lo)));
+}
 
 GLuint createProgram()
 {
@@ -130,6 +138,9 @@ void Demo::ImguiMenu()
     ImGui::SameLine();
     if (ImGui::Button("Collision Demo"))
         demoState = DemoState::COLLISION_DEMO;
+    ImGui::SameLine();
+    if (ImGui::Button("Spring Demo"))
+        demoState = DemoState::SPRING_DEMO;
     ImGui::End();
 }
 
@@ -168,6 +179,18 @@ void Demo::ImguiCollisionDemo()
     ImGui::End();
 }
 
+void Demo::ImguiSpringDemo()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+
+    ImGui::NewFrame();
+    ImGui::Begin("Spring Demo", 0, ImGuiWindowFlags_AlwaysAutoResize);
+    CameraControls();
+    if (ImGui::Button("Back"))
+        demoState = DemoState::MENU;
+    ImGui::End();
+}
 
 void Demo::ClearContext(DemoState oldState)
 {
@@ -181,9 +204,15 @@ void Demo::ClearContext(DemoState oldState)
         break;
     case DemoState::COLLISION_DEMO:
         delete context.collisionDemo.car1;
-        delete context.collisionDemo.car2;
         delete context.collisionDemo.rb1;
+        delete context.collisionDemo.car2;
         delete context.collisionDemo.rb2;
+        break;
+    case DemoState::SPRING_DEMO:
+        delete context.springDemo.mesh1;
+        delete context.springDemo.rb1;
+        delete context.springDemo.mesh2;
+        delete context.springDemo.rb2;
         break;
     default:
         break;
@@ -222,6 +251,10 @@ void Demo::run()
         {
             ImguiCollisionDemo();
         }
+        else if (demoState == DemoState::SPRING_DEMO)
+        {
+            ImguiSpringDemo();
+        }
 
         // ################# TRANSITIONS #################
         if (demoState != oldState)
@@ -240,23 +273,21 @@ void Demo::run()
                 std::cout << "Sample Demo" << std::endl;
 
                 RigidBody* rb = new RigidBody(
-                    Vector3D(0, 0, 0),
+                    Vector3D(0, 1, 0),
                     Quaternion(1, 0, 0, 0),
                     1.0f, 0.99f, 0.99f,
-                    {{0.4, 0, 0}, {0, 0.4, 0}, {0, 0, 0.4}}
+                    {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
                 );
 
                 ObjMesh* mesh = new ObjMesh(createProgram(), meshPath);
                 mesh->SetScale(glm::vec3(0.3f));
                 mesh->SetColor(glm::vec3(1.0f));
-                mesh->SetPosition(glm::vec3(0, 0, 0));
-                mesh->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
                 context.sampleDemo.rb = rb;
                 context.sampleDemo.mesh = mesh;
-                context.sampleDemo.startTime = glfwGetTime();
 
                 PhysicsEngine::AddRigidBody(rb);
+                PhysicsEngine::AddRigidBodyForceGenerator(rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
             }
             else if (demoState == DemoState::COLLISION_DEMO)
             {
@@ -273,8 +304,6 @@ void Demo::run()
                 Cube* cube1 = new Cube(createProgram());
                 cube1->SetScale(glm::vec3(1.0f, 0.2f, 0.5f));
                 cube1->SetColor(glm::vec3(7.0f, 1.0f, 1.0f));
-                cube1->SetPosition(glm::vec3(pos1.x(), pos1.y(), pos1.z()));
-                cube1->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
                 Vector3D pos2(-2, 0, 0);
                 RigidBody* rb2 = new RigidBody(
@@ -287,8 +316,6 @@ void Demo::run()
                 Cube* cube2 = new Cube(createProgram());
                 cube2->SetScale(glm::vec3(1.0f, 0.4f, 0.5f));
                 cube2->SetColor(glm::vec3(1.0f, 7.0f, 7.0f));
-                cube2->SetPosition(glm::vec3(pos2.x(), pos2.y(), pos2.z()));
-                cube2->SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 
                 context.collisionDemo.car1 = cube1;
                 context.collisionDemo.rb1 = rb1;
@@ -300,6 +327,53 @@ void Demo::run()
 
                 PhysicsEngine::AddRigidBody(rb1);
                 PhysicsEngine::AddRigidBody(rb2);
+            }
+            else if (demoState == DemoState::SPRING_DEMO)
+            {
+                std::cout << "Spring Demo" << std::endl;
+
+                Vector3D anchor(0, 4, 0);
+
+                context.springDemo.rb1 = new RigidBody(
+                    Vector3D(0, 3, 0),
+                    Quaternion(1, 0, 0, 0),
+                    1.0f, 0.90f, 0.90f,
+                    {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
+                );
+
+                context.springDemo.mesh1 = new ObjMesh(createProgram(), meshPath);
+                context.springDemo.mesh1->SetScale(glm::vec3(0.2f));
+                context.springDemo.mesh1->SetColor(glm::vec3(1.0f));
+
+                context.springDemo.rb2 = new RigidBody(
+                    Vector3D(0, 2, 0),
+                    Quaternion(1, 0, 0, 0),
+                    1.0f, 0.90f, 0.90f,
+                    {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
+                );
+
+                context.springDemo.mesh2 = new ObjMesh(createProgram(), meshPath);
+                context.springDemo.mesh2->SetScale(glm::vec3(0.2f));
+                context.springDemo.mesh2->SetColor(glm::vec3(1.0f));
+
+                PhysicsEngine::AddRigidBody(context.springDemo.rb1);
+                PhysicsEngine::AddRigidBody(context.springDemo.rb2);
+                PhysicsEngine::AddRigidBodyForceGenerator(
+                    context.springDemo.rb1, 
+                    new AnchoredSpringForceGenerator(anchor, Vector3D(0.15, 0.15, 0.15), 8, 0.75)
+                );
+                PhysicsEngine::AddRigidBodyForceGenerator(
+                    context.springDemo.rb2, 
+                    new SpringForceGenerator(context.springDemo.rb1, Vector3D(-0.15, 0.15, -0.15), Vector3D(0, 0.15, 0.15), 10, 0.5)
+                );
+                PhysicsEngine::AddRigidBodyForceGenerator(
+                    context.springDemo.rb1,
+                    new GravityForceGenerator(Vector3D(0, -9.81, 0))
+                );
+                PhysicsEngine::AddRigidBodyForceGenerator(
+                    context.springDemo.rb2,
+                    new GravityForceGenerator(Vector3D(0, -9.81, 0))
+                );
             }
             lastFrameTime = glfwGetTime();
             // clear PhysicsEngine
@@ -322,10 +396,12 @@ void Demo::run()
         }
         else if (demoState == DemoState::SAMPLE_DEMO)
         {
-            double currentTime = glfwGetTime();
-            if (currentTime - context.sampleDemo.startTime < 0.2f)
-            { 
-                context.sampleDemo.rb->AddForceAtPoint(Vector3D(0, 5, 0), Vector3D(1, 0, 0));
+            Vector3D pos = context.sampleDemo.rb->GetPosition();
+            if (pos.y() < 0.0f)
+            {
+                float intensity = 50 * (1 / 0.1f); // Impulse
+                Vector3D point = Vector3D(frand(-1, 1), 0.0f, frand(-1, 1));
+                context.sampleDemo.rb->AddForceAtPoint(Vector3D(0, intensity, 0), point);
             }
 
 
@@ -382,6 +458,27 @@ void Demo::run()
 
             context.collisionDemo.car1->Draw(proj, view);
             context.collisionDemo.car2->Draw(proj, view);
+        }
+        else if (demoState == DemoState::SPRING_DEMO)
+        {
+            // ################### PHYSICS ###################
+            double deltaTime = glfwGetTime() - lastFrameTime;
+            lastFrameTime = glfwGetTime();
+            PhysicsEngine::Update(deltaTime);
+
+            // ################## GRAPHICS ###################
+            Vector3D r = context.springDemo.rb1->GetRotation();
+            Vector3D v = context.springDemo.rb1->GetPosition();
+            context.springDemo.mesh1->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+            context.springDemo.mesh1->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+            r = context.springDemo.rb2->GetRotation();
+            v = context.springDemo.rb2->GetPosition();
+            context.springDemo.mesh2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
+            context.springDemo.mesh2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
+
+            context.springDemo.mesh1->Draw(proj, view);
+            context.springDemo.mesh2->Draw(proj, view);
         }
 
         grid.Draw(proj, view);
