@@ -1,4 +1,5 @@
 #include "ObjMesh.h"
+#include "Camera.h"
 
 #include <glad/glad.h>
 
@@ -111,14 +112,14 @@ ObjMesh::~ObjMesh()
     //TODO
 }
 
-void ObjMesh::Draw(const glm::mat4& proj, const glm::mat4& view) const
+void ObjMesh::Draw() const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
     glm::mat4 trans = m_T * m_S * m_R;
     glUniformMatrix4fv(m_modelUni, 1, GL_FALSE, glm::value_ptr(trans));
-    glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
-    glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(Camera::getProj()));
+    glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(Camera::getView()));
     glUniform3fv(m_albedoUni, 1, glm::value_ptr(m_albedo));
     glDrawElements(GL_TRIANGLES, m_numIndices, GL_UNSIGNED_INT, 0);
 }

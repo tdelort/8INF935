@@ -4,16 +4,43 @@
 
 #include <glm/glm.hpp>
 
+// Camera singleton
 class Camera
 {
 private:
-    glm::mat4 m_proj;
-    glm::mat4 m_view;
+    glm::mat4 proj;
+    glm::mat4 view;
+
+    Camera() = default;
 public:
-    Camera(glm::mat4 proj, glm::mat4 view);
+    Camera(const Camera&) = delete;
+    Camera& operator=(const Camera&) = delete;
+    Camera(const Camera&&) = delete;
+    Camera& operator=(const Camera&&) = delete;
 
-    glm::mat4 GetProj() const;
-    glm::mat4 GetView() const;
+    static Camera& instance()
+    {
+        static Camera instance;
+        return instance;
+    }
 
-    ~Camera();
+    static void setProj(const glm::mat4& proj)
+    {
+        instance().proj = proj;
+    }
+
+    static void setView(const glm::mat4& view)
+    {
+        instance().view = view;
+    }
+
+    static const glm::mat4& getProj()
+    {
+        return instance().proj;
+    }
+
+    static const glm::mat4& getView()
+    {
+        return instance().view;
+    }
 };

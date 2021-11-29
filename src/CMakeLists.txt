@@ -6,14 +6,15 @@ target_sources(${PROJECT_NAME}
 		IDrawable.cpp
 		Cube.cpp
 		ObjMesh.cpp
-		Camera.cpp
 		Grid.cpp
 		Matrix3x3.cpp
 		Matrix3x4.cpp
 		Quaternion.cpp
 		RigidBody.cpp
+		OcTree.cpp
 )
 
 add_subdirectory(particle_forces)
 add_subdirectory(particle_contacts)
 add_subdirectory(rigidbody_forces)
+add_subdirectory(rigidbody_contacts)

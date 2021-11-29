@@ -1,4 +1,5 @@
 #include "Grid.h"
+#include "Camera.h"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -132,11 +133,11 @@ Grid::~Grid()
     
 }
 
-void Grid::Draw(const glm::mat4& proj, const glm::mat4& view) const
+void Grid::Draw() const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
-    glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
-    glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(Camera::getProj()));
+    glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(Camera::getView()));
     glDrawElements(GL_LINES, 4 * size * 2, GL_UNSIGNED_INT, 0);
 }

@@ -7,6 +7,7 @@
 #include <ObjMesh.h>
 #include <Grid.h>
 #include <RigidBody.h>
+#include <Camera.h>
 
 #include <glm/glm.hpp>
 
@@ -42,15 +43,12 @@ class Demo
     } context;
 
     // Cilinder coordinates
-    struct Camera {
+    struct CameraData {
         float theta;
         float radius, height;
         glm::vec3 target;
         bool follow;
     } camera;
-
-    glm::mat4 view;
-    glm::mat4 proj;
 
     double lastFrameTime;
     DemoState demoState = DemoState::MENU;

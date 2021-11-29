@@ -12,7 +12,7 @@ public:
     Cube(GLuint program);
     ~Cube();
 
-    void Draw(const glm::mat4& proj, const glm::mat4& view) const override;
+    void Draw() const override;
 
     void SetPosition(const glm::vec3& position);
     void SetRotation(const glm::vec3& rotation);

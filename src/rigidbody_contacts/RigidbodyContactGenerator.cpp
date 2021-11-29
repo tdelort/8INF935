@@ -1,0 +1,1 @@
+#include "rigidbody_contacts\RigidbodyContactGenerator.h"

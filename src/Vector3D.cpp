@@ -176,6 +176,42 @@ Vector3D Vector3D::operator/(double rhs) const
 	return Vector3D(*this) /= rhs;
 }
 
+Vector3D Vector3D::operator<(const Vector3D& rhs) const
+{
+	return Vector3D(
+		m_x < rhs.m_x ? 1 : 0,
+		m_y < rhs.m_y ? 1 : 0,
+		m_z < rhs.m_z ? 1 : 0
+	);
+}
+
+Vector3D Vector3D::operator>(const Vector3D& rhs) const
+{
+	return Vector3D(
+		m_x > rhs.m_x ? 1 : 0,
+		m_y > rhs.m_y ? 1 : 0,
+		m_z > rhs.m_z ? 1 : 0
+	);
+}
+
+Vector3D Vector3D::operator&&(const Vector3D& rhs) const
+{
+	return Vector3D(
+		m_x && rhs.m_x ? 1 : 0,
+		m_y && rhs.m_y ? 1 : 0,
+		m_z && rhs.m_z ? 1 : 0
+	);
+}
+
+Vector3D Vector3D::operator*(const Vector3D& rhs) const
+{
+	return Vector3D(
+		m_x * rhs.m_x,
+		m_y * rhs.m_y,
+		m_z * rhs.m_z
+	);
+}
+
 bool Vector3D::operator==(const Vector3D& other) const
 {
 	return m_x == other.m_x && m_y == other.m_y && m_z == other.m_z;
@@ -200,3 +236,8 @@ Vector3D operator*(double lhs, const Vector3D& rhs)
 	return Vector3D(rhs) *= lhs;
 }
 
+
+Vector3D::operator glm::vec3() const
+{
+	return glm::vec3(m_x, m_y, m_z);
+}

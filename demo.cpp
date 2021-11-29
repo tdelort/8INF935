@@ -35,47 +35,13 @@
 #include <rigidbody_forces/SpringForceGenerator.h>
 #include <rigidbody_forces/AnchoredSpringForceGenerator.h>
 
+#include <Camera.h>
+
 inline float frand(int lo, int hi)
 {
     return lo + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(hi-lo)));
 }
 
-GLuint createProgram()
-{
-    // Creating Vertex shader
-    GLint status;
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexSource, NULL);
-    glCompileShader(vertexShader);
-
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-    std::cout << "Vertex shader compile status : " << status << std::endl;
-
-    // Creating Geometry shader
-    GLuint geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-    glShaderSource(geometryShader, 1, &geometrySource, NULL);
-    glCompileShader(geometryShader);
-
-    glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &status);
-    std::cout << "Geometry shader compile status : " << status << std::endl;
-
-    // Creating Fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
-    std::cout << "Fragment shader compile status : " << status << std::endl;
-    
-    // Creating shader program and linking it
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, geometryShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-    glUseProgram(program);
-    return program;
-}
 
 void Demo::CameraControls()
 {
@@ -279,7 +245,7 @@ void Demo::run()
                     {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
                 );
 
-                ObjMesh* mesh = new ObjMesh(createProgram(), meshPath);
+                ObjMesh* mesh = new ObjMesh(createProgram(false), meshPath);
                 mesh->SetScale(glm::vec3(0.3f));
                 mesh->SetColor(glm::vec3(1.0f));
 
@@ -301,7 +267,7 @@ void Demo::run()
                     {{0.4, 0, 0}, {0, 0.4, 0}, {0, 0, 0.4}}
                 );
 
-                Cube* cube1 = new Cube(createProgram());
+                Cube* cube1 = new Cube(createProgram(false));
                 cube1->SetScale(glm::vec3(1.0f, 0.2f, 0.5f));
                 cube1->SetColor(glm::vec3(7.0f, 1.0f, 1.0f));
 
@@ -313,7 +279,7 @@ void Demo::run()
                     {{0.4, 0, 0}, {0, 0.4, 0}, {0, 0, 0.4}}
                 );
 
-                Cube* cube2 = new Cube(createProgram());
+                Cube* cube2 = new Cube(createProgram(false));
                 cube2->SetScale(glm::vec3(1.0f, 0.4f, 0.5f));
                 cube2->SetColor(glm::vec3(1.0f, 7.0f, 7.0f));
 
@@ -341,7 +307,7 @@ void Demo::run()
                     {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
                 );
 
-                context.springDemo.mesh1 = new ObjMesh(createProgram(), meshPath);
+                context.springDemo.mesh1 = new ObjMesh(createProgram(true), meshPath);
                 context.springDemo.mesh1->SetScale(glm::vec3(0.2f));
                 context.springDemo.mesh1->SetColor(glm::vec3(1.0f));
 
@@ -352,7 +318,7 @@ void Demo::run()
                     {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
                 );
 
-                context.springDemo.mesh2 = new ObjMesh(createProgram(), meshPath);
+                context.springDemo.mesh2 = new ObjMesh(createProgram(false), meshPath);
                 context.springDemo.mesh2->SetScale(glm::vec3(0.2f));
                 context.springDemo.mesh2->SetColor(glm::vec3(1.0f));
 
@@ -380,15 +346,15 @@ void Demo::run()
         }
 
         gui->clear(clear_color);
-        view = glm::lookAt(
+        Camera::setView(glm::lookAt(
             glm::vec3(camera.radius * cos(camera.theta), camera.height, camera.radius * sin(camera.theta)),
             camera.target,
             glm::vec3(0.0f, 1.0f, 0.0f)
-        );
+        ));
 
         int width, height;
         glfwGetWindowSize(gui->GetWindow(), &width, &height);
-        proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f);
+        Camera::setProj(glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f));
 
         if (demoState == DemoState::MENU)
         {
@@ -407,7 +373,7 @@ void Demo::run()
             SpringDemo();
         }
 
-        grid.Draw(proj, view);
+        grid.Draw();
 
         gui->swapBuffers();
     }
@@ -434,7 +400,7 @@ void Demo::SampleDemo()
     Vector3D v = context.sampleDemo.rb->GetPosition();
     context.sampleDemo.mesh->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
     context.sampleDemo.mesh->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
-    context.sampleDemo.mesh->Draw(proj, view);
+    context.sampleDemo.mesh->Draw();
 }
 
 void Demo::CollisionDemo()
@@ -476,8 +442,8 @@ void Demo::CollisionDemo()
     context.collisionDemo.car2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
     context.collisionDemo.car2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
 
-    context.collisionDemo.car1->Draw(proj, view);
-    context.collisionDemo.car2->Draw(proj, view);
+    context.collisionDemo.car1->Draw();
+    context.collisionDemo.car2->Draw();
 }
 
 void Demo::SpringDemo()
@@ -498,6 +464,6 @@ void Demo::SpringDemo()
     context.springDemo.mesh2->SetPosition(glm::vec3(v.x(), v.y(), v.z()));
     context.springDemo.mesh2->SetRotation(glm::vec3(r.x(), r.y(), r.z()));
 
-    context.springDemo.mesh1->Draw(proj, view);
-    context.springDemo.mesh2->Draw(proj, view);
+    context.springDemo.mesh1->Draw();
+    context.springDemo.mesh2->Draw();
 }

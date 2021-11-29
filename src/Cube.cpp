@@ -1,4 +1,5 @@
 #include "Cube.h"
+#include "Camera.h"
 
 #include <glad/glad.h>
 
@@ -63,14 +64,14 @@ Cube::~Cube()
     //TODO
 }
 
-void Cube::Draw(const glm::mat4& proj, const glm::mat4& view) const
+void Cube::Draw() const
 {
     glUseProgram(m_program);
     glBindVertexArray(m_vao);
     glm::mat4 trans = m_T * m_R * m_S;
     glUniformMatrix4fv(m_modelUni, 1, GL_FALSE, glm::value_ptr(trans));
-    glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(proj));
-    glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(m_projUni, 1, GL_FALSE, glm::value_ptr(Camera::getProj()));
+    glUniformMatrix4fv(m_viewUni, 1, GL_FALSE, glm::value_ptr(Camera::getView()));
     glUniform3fv(m_albedoUni, 1, glm::value_ptr(m_albedo));
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 }

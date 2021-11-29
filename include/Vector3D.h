@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <glm/glm.hpp>
+
 class Vector3D
 {
 private:
@@ -48,10 +50,19 @@ public:
 	Vector3D operator*(double rhs) const;
 	Vector3D operator/(double rhs) const;
 
+	Vector3D operator<(const Vector3D& rhs) const;
+	Vector3D operator>(const Vector3D& rhs) const;
+
+	Vector3D operator&&(const Vector3D& rhs) const;
+	// Scale
+	Vector3D operator*(const Vector3D& rhs) const;
+
 	bool operator==(const Vector3D& other) const;
 	bool operator!=(const Vector3D& other) const;
 
 	friend Vector3D operator*(double lhs, const Vector3D& rhs);
 	friend std::ostream& operator<<(std::ostream& stream, const Vector3D& v);
+
+	operator glm::vec3() const;
 };
 

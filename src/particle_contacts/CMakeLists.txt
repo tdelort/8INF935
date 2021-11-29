@@ -3,7 +3,6 @@ target_sources(${PROJECT_NAME}
         NaiveParticleContactGenerator.cpp
         ParticleCable.cpp
         ParticleContact.cpp
-        ParticleContactGenerator.cpp
         ParticleContactResolver.cpp
         ParticleLink.cpp
         ParticleRod.cpp
