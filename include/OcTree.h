@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #define OCTREE_DEBUG
+
 #ifdef OCTREE_DEBUG
 #include "Cube.h"
 #include "Shader.h"

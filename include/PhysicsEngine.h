@@ -51,8 +51,6 @@ public:
         return instance;
     }
 
-    static void Init();
-
     static void AddParticle(Particle* particle);
     static void AddParticleForceGenerator(Particle* p, ParticleForceGenerator* particleForceGenerator);
     static void AddParticleContactGenerator(ParticleContactGenerator* particleContactGenerator);
@@ -66,12 +64,10 @@ public:
 
     static std::vector<Particle*> GetParticles();
     static std::vector<GameObject*> GetGameObjects();
+#ifdef OCTREE_DEBUG
+    static void DrawOctree();
+#endif
 };
-
-void PhysicsEngine::Init()
-{
-    instance().octree = OcTree(Vector3D(0, 0, 0), Vector3D(10, 10, 10));
-}
 
 // Add things
 void PhysicsEngine::AddParticle(Particle* particle)
@@ -170,10 +166,10 @@ void PhysicsEngine::ResolveCollisionsParticles(float dt)
 
 void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
 {
-    //octree.Clear();
+    instance().octree = OcTree(Vector3D(0, 0, 0), Vector3D(3, 3, 3));
 
-    //for(auto& obj : instance().gameObjects)
-    //    octree.Insert(obj->collider);
+    for(auto& obj : instance().gameObjects)
+        instance().octree.Insert(obj->collider);
 
     std::vector<Contact*> rigidBodyContacts;
 
@@ -181,12 +177,7 @@ void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
 
     for(auto& obj : instance().gameObjects)
     {
-        //std::vector<Primitive*> queryResults = octree.Query(obj->collider);
-
-        // En attendant de trouver une solution pour le query
-        std::vector<Primitive*> queryResults;
-        for(auto& obj2 : instance().gameObjects)
-            queryResults.push_back(obj2->collider);
+        std::vector<Primitive*> queryResults = instance().octree.Query(obj->collider);
 
         for(auto& otherCol : queryResults)
         {
@@ -208,4 +199,9 @@ void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
     {
         std::cout << "Collision detected!" << std::endl;
     }
+}
+
+void PhysicsEngine::DrawOctree()
+{
+    instance().octree.Draw();
 }

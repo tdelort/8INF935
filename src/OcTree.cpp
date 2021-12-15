@@ -24,7 +24,6 @@ OcTree::OcTree(Vector3D center, Vector3D halfSize)
     root.debugHalfSize = glm::vec3(halfSize.x(), halfSize.y(), halfSize.z());
 #endif
     m_nodes.insert(std::pair<uint32_t, Node>(0b1, root));
-    std::cout << "OcTree created with center: " << center << " and halfSize: " << halfSize << std::endl;
 }
 
 int OcTree::_GetIndex(AABB aabb, Vector3D center, Vector3D halfSize) const
@@ -151,12 +150,28 @@ std::vector<Primitive*> OcTree::_Query(AABB aabb, int depth, uint32_t locCodeAcc
 // returns all objects that could collide with obj (including obj)
 std::vector<Primitive*> OcTree::Query(Primitive* obj) const
 {
+    AABB aabb = obj->GetAABB();
+    Vector3D min = aabb.min > m_center + m_halfSize; // 1 on any dimension means the object is outside the root
+    Vector3D max = aabb.max < m_center - m_halfSize;
+    if(min != Vector3D(0, 0, 0) || max != Vector3D(0, 0, 0))
+        return std::vector<Primitive*>();
+
     return _Query(obj->GetAABB(), 0, 0b1, m_center, m_halfSize);
 }
 
 void OcTree::Clear()
 {
     m_nodes.clear();
+
+    Node root;
+    root.locCode = 0b1;
+    root.subdivided = false;
+#ifdef OCTREE_DEBUG
+    root.debugCube = new Cube(createProgram(true));
+    root.debugCenter = glm::vec3(m_center.x(), m_center.y(), m_center.z());
+    root.debugHalfSize = glm::vec3(m_halfSize.x(), m_halfSize.y(), m_halfSize.z());
+#endif
+    m_nodes.insert(std::pair<uint32_t, Node>(0b1, root));
 }
 
 uint8_t OcTree::depth(uint32_t value)

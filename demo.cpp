@@ -128,7 +128,6 @@ void Demo::run()
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
     camera = {3.14 * 0.5, 5.0, 2.5, glm::vec3(0.0, 0.0, 0.0), false};
     lastFrameTime = glfwGetTime();
-    PhysicsEngine::Init();
 
 	while(gui->isOpen())
     {
@@ -159,7 +158,7 @@ void Demo::run()
                 std::cout << "Sample Demo" << std::endl;
 
                 RigidBody* rb1 = new RigidBody(
-                    Vector3D(0, 2, 0),
+                    Vector3D(0, 5, 0),
                     Quaternion(1, 0, 0, 0),
                     1.0f, 0.99f, 0.99f,
                     {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
@@ -234,4 +233,8 @@ void Demo::SampleDemo()
     context.sampleDemo.sphere2->drawable->SetPosition(context.sampleDemo.sphere2->rb->GetPosition());
     context.sampleDemo.sphere2->drawable->SetRotation(context.sampleDemo.sphere2->rb->GetRotation());
     context.sampleDemo.sphere2->drawable->Draw();
+
+#ifdef OCTREE_DEBUG
+    PhysicsEngine::DrawOctree();
+#endif
 }
