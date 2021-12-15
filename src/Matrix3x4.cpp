@@ -113,3 +113,8 @@ Matrix3x3 Matrix3x4::ToMatrix3x3() const
     };
     return res;
 }
+
+Vector3D Matrix3x4::GetPosition() const
+{
+    return Vector3D(m_data[3], m_data[7], m_data[11]);
+}

@@ -56,6 +56,7 @@ public :
 
 public:
     OcTree(Vector3D center, Vector3D halfSize);
+    OcTree();
 
     // returns all objects that could collide with obj (including obj)
     std::vector<Primitive*> Query(Primitive* obj) const;

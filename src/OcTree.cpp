@@ -10,6 +10,8 @@
 
 #define OT_NEW_CENTER(c, h, i) (c + ((h * 0.5) * Vector3D(i & 0b1 ? 1 : -1, i & 0b10 ? 1 : -1, i & 0b100 ? 1 : -1)))
 
+OcTree::OcTree() : OcTree(Vector3D(0, 0, 0), Vector3D(10, 10, 10)) {}
+
 OcTree::OcTree(Vector3D center, Vector3D halfSize)
     : m_center(center), m_halfSize(halfSize)
 {
@@ -22,6 +24,7 @@ OcTree::OcTree(Vector3D center, Vector3D halfSize)
     root.debugHalfSize = glm::vec3(halfSize.x(), halfSize.y(), halfSize.z());
 #endif
     m_nodes.insert(std::pair<uint32_t, Node>(0b1, root));
+    std::cout << "OcTree created with center: " << center << " and halfSize: " << halfSize << std::endl;
 }
 
 int OcTree::_GetIndex(AABB aabb, Vector3D center, Vector3D halfSize) const

@@ -11,6 +11,6 @@ add_subdirectory(libs)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} IMGUI GLAD glm::glm)
 
-add_executable(${PROJECT_NAME}Tests octree_tests.cpp)
-#add_executable(${PROJECT_NAME}Tests main.cpp demo.cpp)
+#add_executable(${PROJECT_NAME}Tests octree_tests.cpp)
+add_executable(${PROJECT_NAME}Tests main.cpp demo.cpp)
 target_link_libraries(${PROJECT_NAME}Tests ${PROJECT_NAME})

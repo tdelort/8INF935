@@ -59,7 +59,7 @@ int main()
         else 
             c = Vector3D(frand(-4, 4), frand(-4, 4), frand(-4, 4));
         boxes[i] = new Box();
-        boxes[i]->center = c;
+        boxes[i]->offset = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
         boxes[i]->halfSize = Vector3D(frand(0.1, 0.5), frand(0.1, 0.5), frand(0.1, 0.5)) / 2;
         octree.Insert(boxes[i]);
         cubes[i] = new Cube(createProgram(false));
@@ -118,7 +118,7 @@ int main()
                 auto it = std::find(primitives.begin(), primitives.end(), boxes[i]);
                 if (showAll || it != primitives.end())
                 {
-                    cubes[i]->SetPosition(boxes[i]->center);
+                    cubes[i]->SetPosition(boxes[i]->GetCenter());
                     cubes[i]->SetScale(boxes[i]->halfSize * 2);
                     cubes[i]->Draw();
                 }

@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include <iostream>
+
 IDrawable::IDrawable(GLuint program)
     : m_program(program)
 {}
@@ -35,4 +37,14 @@ void IDrawable::Init(GLfloat* vertex, size_t sizeVertex, GLfloat* colors, size_t
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeEbo, ebo, GL_STATIC_DRAW);
 
+}
+
+void IDrawable::SetPosition(const glm::vec3& position)
+{
+    std::cerr << "SetPosition not implemented" << std::endl;
+}
+
+void IDrawable::SetRotation(const glm::vec3& rotation)
+{
+    std::cerr << "SetRotation not implemented" << std::endl;
 }

@@ -25,4 +25,14 @@ public:
     Vector3D TransformDirection(const Vector3D& vector);
 
     Matrix3x3 ToMatrix3x3() const;
+
+    Vector3D GetPosition() const;
+
+    static Matrix3x4 Identity() { 
+        return Matrix3x4({
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0}
+        }); 
+    }
 };

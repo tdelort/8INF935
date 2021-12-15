@@ -25,4 +25,9 @@ public:
     };
 
     virtual Type GetType() const = 0;
+
+	inline Vector3D GetCenter() const
+	{
+		return rb->WorldPosition(offset.GetPosition());
+	}
 };

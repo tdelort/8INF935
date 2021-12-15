@@ -7,11 +7,10 @@ class Box : public Primitive
 {
 public:
     Vector3D halfSize;
-    // center is debug
-    Vector3D center;
 
     inline AABB GetAABB() const override
     {
+		Vector3D center = rb->WorldPosition(offset.GetPosition());
         return {center - halfSize, center + halfSize};
     }
 

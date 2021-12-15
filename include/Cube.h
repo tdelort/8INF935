@@ -14,8 +14,8 @@ public:
 
     void Draw() const override;
 
-    void SetPosition(const glm::vec3& position);
-    void SetRotation(const glm::vec3& rotation);
+    void SetPosition(const glm::vec3& position) override;
+    void SetRotation(const glm::vec3& rotation) override;
     void SetScale(const glm::vec3& scale);
     void SetColor(const glm::vec3& rgb);
 

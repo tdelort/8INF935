@@ -7,6 +7,7 @@
 #include <ObjMesh.h>
 #include <Grid.h>
 #include <RigidBody.h>
+#include <GameObject.h>
 #include <Camera.h>
 
 #include <glm/glm.hpp>
@@ -16,30 +17,13 @@ class Demo
     enum class DemoState {
         MENU,
         SAMPLE_DEMO,
-        COLLISION_DEMO,
-        SPRING_DEMO
     };
 
     union DemoContext {
         struct {
-            ObjMesh* mesh;
-            RigidBody* rb;
+            GameObject* sphere1;
+            GameObject* sphere2;
         } sampleDemo;
-        struct {
-            Cube* car1;
-            RigidBody* rb1;
-            Cube* car2;
-            RigidBody* rb2;
-            double startTime;
-            bool collided;
-            bool started;
-        } collisionDemo;
-        struct {
-            ObjMesh* mesh1;
-            RigidBody* rb1;
-            ObjMesh* mesh2;
-            RigidBody* rb2;
-        } springDemo;
     } context;
 
     // Cilinder coordinates
