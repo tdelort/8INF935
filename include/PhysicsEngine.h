@@ -197,7 +197,11 @@ void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
 
     if(rigidBodyContacts.size() > 0)
     {
-        std::cout << "Collision detected!" << std::endl;
+        for(auto& contact : rigidBodyContacts)
+        {
+            contact->rigidbodies[0]->onCollision(contact);
+            contact->rigidbodies[1]->onCollision(contact);
+        }
     }
 }
 

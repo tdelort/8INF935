@@ -14,3 +14,7 @@ target_link_libraries(${PROJECT_NAME} IMGUI GLAD glm::glm)
 #add_executable(${PROJECT_NAME}Tests octree_tests.cpp)
 add_executable(${PROJECT_NAME}Tests main.cpp demo.cpp)
 target_link_libraries(${PROJECT_NAME}Tests ${PROJECT_NAME})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E create_symlink
+${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:${PROJECT_NAME}>/data)

@@ -8,6 +8,12 @@
 
 #include <string>
 
+namespace MeshPath
+{
+    static const char* teapot = "data/teapot.obj";
+    static const char* sphere = "data/sphere.obj";
+}
+
 class ObjMesh : public IDrawable
 {
 public:

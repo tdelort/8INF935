@@ -14,6 +14,7 @@ RigidBody::RigidBody(Vector3D position, Quaternion orientation, float mass, floa
 {
 	m_invTenseurInertie = tenseurInertie.Inverse();
 	CalculateDerivedData();
+    onCollision = [](Contact* contact) {};
 }
 
 void RigidBody::Integrate(float duration)

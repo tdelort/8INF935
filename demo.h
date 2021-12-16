@@ -23,6 +23,7 @@ class Demo
         struct {
             GameObject* sphere1;
             GameObject* sphere2;
+            bool running;
         } sampleDemo;
     } context;
 
@@ -36,7 +37,6 @@ class Demo
 
     double lastFrameTime;
     DemoState demoState = DemoState::MENU;
-    char* meshPath;
 
     void CameraControls();
     void ImguiMenu();
@@ -49,7 +49,10 @@ class Demo
     void SampleDemo();
     void CollisionDemo();
     void SpringDemo();
+
+    void OnCollision(Contact* data);
+    Contact* lastContact = nullptr;
 public:
-    Demo(char *path);
+    Demo();
     void run();
 };

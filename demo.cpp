@@ -43,6 +43,12 @@ inline float frand(int lo, int hi)
     return lo + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(hi-lo)));
 }
 
+void Demo::OnCollision(Contact* data)
+{
+    std::cout << "Collision" << std::endl;
+    context.sampleDemo.running = false;
+    lastContact = data;
+}
 
 void Demo::CameraControls()
 {
@@ -99,6 +105,7 @@ void Demo::ImguiSampleDemo()
     CameraControls();
     if (ImGui::Button("Back"))
         demoState = DemoState::MENU;
+    ImGui::Checkbox("Running", &context.sampleDemo.running);
     ImGui::End();
 }
 
@@ -115,9 +122,9 @@ void Demo::ClearContext(DemoState oldState)
     }
 }
 
-Demo::Demo(char* path)
+Demo::Demo()
 {
-    meshPath = path;
+
 }
 
 void Demo::run()
@@ -158,14 +165,15 @@ void Demo::run()
                 std::cout << "Sample Demo" << std::endl;
 
                 RigidBody* rb1 = new RigidBody(
-                    Vector3D(0, 5, 0),
+                    Vector3D(0.5, 5, 0),
                     Quaternion(1, 0, 0, 0),
                     1.0f, 0.99f, 0.99f,
                     {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
                 );
+                rb1->onCollision = [this](Contact* contact){ OnCollision(contact); };
 
-                ObjMesh* mesh1 = new ObjMesh(createProgram(false), meshPath);
-                mesh1->SetScale(glm::vec3(0.3f));
+                ObjMesh* mesh1 = new ObjMesh(createProgram(true), MeshPath::sphere);
+                mesh1->SetScale(glm::vec3(1));
                 mesh1->SetColor(glm::vec3(1.0f));
 
                 Primitive* col1 = new Sphere(0.5f);
@@ -181,8 +189,8 @@ void Demo::run()
                     {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
                 );
 
-                ObjMesh* mesh2 = new ObjMesh(createProgram(false), meshPath);
-                mesh2->SetScale(glm::vec3(0.3f));
+                ObjMesh* mesh2 = new ObjMesh(createProgram(true), MeshPath::sphere);
+                mesh2->SetScale(glm::vec3(1));
                 mesh2->SetColor(glm::vec3(1.0f));
 
                 Primitive* col2 = new Sphere(0.5f);
@@ -223,7 +231,17 @@ void Demo::SampleDemo()
     // ################### PHYSICS ###################
     double deltaTime = glfwGetTime() - lastFrameTime;
     lastFrameTime = glfwGetTime();
-    PhysicsEngine::Update(deltaTime);
+    if(context.sampleDemo.running)
+    {
+        PhysicsEngine::Update(deltaTime);
+    }
+    else
+    {
+        if(lastContact != nullptr)
+        {
+            lastContact->Draw();
+        }
+    }
 
     // ################## GRAPHICS ###################
     context.sampleDemo.sphere1->drawable->SetPosition(context.sampleDemo.sphere1->rb->GetPosition());
@@ -233,7 +251,6 @@ void Demo::SampleDemo()
     context.sampleDemo.sphere2->drawable->SetPosition(context.sampleDemo.sphere2->rb->GetPosition());
     context.sampleDemo.sphere2->drawable->SetRotation(context.sampleDemo.sphere2->rb->GetRotation());
     context.sampleDemo.sphere2->drawable->Draw();
-
 #ifdef OCTREE_DEBUG
     PhysicsEngine::DrawOctree();
 #endif

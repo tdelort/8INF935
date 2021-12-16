@@ -5,6 +5,10 @@
 #include "Matrix3x4.h"
 #include "Matrix3x3.h"
 
+#include <functional>
+
+struct Contact;
+
 class RigidBody
 {
     private:
@@ -29,6 +33,7 @@ class RigidBody
     Vector3D m_torqueAccum;
 
     public:
+    std::function<void(Contact*)> onCollision;
 
     RigidBody(Vector3D position, Quaternion orientation, float mass, float damping, float angularDamping, Matrix3x3 tenseurInertie);
 
