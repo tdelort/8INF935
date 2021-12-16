@@ -10,8 +10,13 @@ public:
 
     inline AABB GetAABB() const override
     {
-		Vector3D center = rb->WorldPosition(offset.GetPosition());
-        return {center - halfSize, center + halfSize};
+        Vector3D center = GetCenter();
+        Vector3D min = center - halfSize;
+        Vector3D max = center + halfSize;
+		Vector3D minWorld = rb->WorldPosition(min);
+        Vector3D maxWorld = rb->WorldPosition(max);
+
+        return { minWorld, maxWorld };
     }
 
     inline Type GetType() const override

@@ -179,6 +179,19 @@ void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
     {
         std::vector<Primitive*> queryResults = instance().octree.Query(obj->collider);
 
+        if(queryResults.size() == 0)
+        {
+            // Element too big or outside of the octree
+            // For now, make it collide with everything
+            for(auto& other : instance().gameObjects)
+            {
+                if(other == obj)
+                    continue;
+
+                CollisionDetector::generateContacts(*obj->collider, *other->collider, &rigidBodyContacts);
+            }
+        }
+
         for(auto& otherCol : queryResults)
         {
             if(obj->collider == otherCol)
@@ -191,7 +204,6 @@ void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
             // Narrow phase
             CollisionDetector::generateContacts(*obj->collider, *otherCol, &rigidBodyContacts);
         }
-
         done.push_back(obj->collider);
     }
 
