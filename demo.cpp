@@ -47,7 +47,7 @@ inline float frand(int lo, int hi)
 void Demo::OnCollision(Contact* data)
 {
     std::cout << "Collision" << std::endl;
-    context.running = false;
+    running = false;
     lastContacts.push_back(data);
 }
 
@@ -55,8 +55,8 @@ void Demo::CameraControls()
 {
     ImGui::Text("Camera configuration :");
     ImGui::SliderFloat("Camera theta", &camera.theta, 0, 3.14f * 2.0f);
-    ImGui::SliderFloat("Camera height", &camera.height, -5, 5);
-    ImGui::SliderFloat("Camera radius", &camera.radius, 1, 10);
+    ImGui::SliderFloat("Camera height", &camera.height, -10, 10);
+    ImGui::SliderFloat("Camera radius", &camera.radius, 1, 30);
 
     ImGui::SliderFloat("Target x", &camera.target.x, -10, 10);
     ImGui::SliderFloat("Target y", &camera.target.y, -10, 10);
@@ -73,6 +73,9 @@ void Demo::ImguiMenu()
     ImGui::SameLine();
     if (ImGui::Button("Box Plane"))
         demoState = DemoState::BOX_PLANE;
+    ImGui::SameLine();
+    if (ImGui::Button("Octree"))
+        demoState = DemoState::OCTREE;
     ImGui::End();
 }
 
@@ -82,18 +85,25 @@ void Demo::ImguiDemo()
     CameraControls();
     if (ImGui::Button("Back"))
         demoState = DemoState::MENU;
-    ImGui::Checkbox("Running", &context.running);
+    ImGui::Checkbox("Running", &running);
+#ifdef OCTREE_DEBUG
+    ImGui::SameLine();
+    ImGui::Checkbox("Show Octree", &showOctree);
+#endif
     ImGui::End();
 }
 
-void Demo::ClearContext()
+void Demo::ClearObjects()
 {
-    delete context.obj1->rb;
-    delete context.obj1->drawable;
-    delete context.obj1->collider;
-    delete context.obj2->rb;
-    delete context.obj2->drawable;
-    delete context.obj2->collider;
+    for(auto& obj : objects)
+    {
+        delete obj->rb;
+        delete obj->drawable;
+        delete obj->collider;
+        delete obj;
+    }
+
+    objects.clear();
 }
 
 GameObject* Demo::CreateObject(const Vector3D& position, Primitive::Type type)
@@ -158,7 +168,7 @@ void Demo::run()
     Gui* gui = new Gui();
     Grid grid(Grid::CreateProgram());
     ImVec4 clear_color = ImVec4(0, 0, 0, 1);
-    camera = {3.14 * 0.5, 5.0, 2.5, glm::vec3(0.0, 0.0, 0.0), false};
+    camera = {3.14 * 0.5, 10.0, 2.5, glm::vec3(0.0, 0.0, 0.0), false};
     lastFrameTime = glfwGetTime();
 
     DemoState oldState = demoState;
@@ -182,44 +192,59 @@ void Demo::run()
         if (demoState != oldState)
         {
             std::cout << "Transition to : ";
-
-            if (demoState == DemoState::MENU)
+            // Demo initialization
+            switch(demoState)
             {
-                ClearContext();
-                PhysicsEngine::Clear();
-                lastContacts.clear();
-                std::cout << "Menu" << std::endl;
-                context.running = true;
-            }
-            else 
-            {
-                // Demo initialization
-                switch(demoState)
+                case DemoState::SPHERE_SPHERE:
                 {
-                    case DemoState::SPHERE_SPHERE:
-                        std::cout << "Sphere Sphere" << std::endl;
-                        context.obj1 = CreateObject(Vector3D(0, 0, 0), Primitive::Type::SPHERE);
-                        context.obj2 = CreateObject(Vector3D(0.5, 3, 0.5), Primitive::Type::SPHERE);
-                        PhysicsEngine::AddRigidBodyForceGenerator(context.obj2->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
-                        break;
-                    case DemoState::BOX_PLANE:
-                        std::cout << "Box Plane" << std::endl;
-                        context.obj1 = CreateObject(Vector3D(1, -1, 0), Primitive::Type::PLANE);
-                        context.obj2 = CreateObject(Vector3D(0.5, 1, 0), Primitive::Type::BOX);
-                        PhysicsEngine::AddRigidBodyForceGenerator(context.obj2->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
-                        break;
-                    default:
-                        std::cout << "Unknown" << std::endl;
-                        break;
+                    std::cout << "Sphere Sphere" << std::endl;
+                    objects.push_back(CreateObject(Vector3D(0, 0, 0), Primitive::Type::SPHERE));
+                    GameObject* obj = CreateObject(Vector3D(0.5, 3, 0.5), Primitive::Type::SPHERE);
+                    PhysicsEngine::AddRigidBodyForceGenerator(obj->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
+                    objects.push_back(obj);
+                    break;
                 }
-
-                PhysicsEngine::AddGameObject(context.obj1);
-                PhysicsEngine::AddGameObject(context.obj2);
+                case DemoState::BOX_PLANE:
+                {
+                    std::cout << "Box Plane" << std::endl;
+                    objects.push_back(CreateObject(Vector3D(1, -1, 0), Primitive::Type::PLANE));
+                    GameObject* obj = CreateObject(Vector3D(0.5, 1, 0), Primitive::Type::BOX);
+                    PhysicsEngine::AddRigidBodyForceGenerator(obj->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
+                    objects.push_back(obj);
+                    break;
+                }
+                case DemoState::OCTREE:
+                {
+                    int N = 64;
+                    for(int i = 0; i < N; i++)
+                    {
+                        Vector3D c = 4 * Vector3D(frand(-1, 1), frand(-1, 1), frand(-1, 1));
+                        GameObject* obj = CreateObject(c, Primitive::Type::SPHERE);
+                        objects.push_back(obj);
+                    }
+                    break;
+                }
+                default: // DemoState::MENU
+                {
+                    ClearObjects();
+                    PhysicsEngine::Clear();
+                    lastContacts.clear();
+                    std::cout << "Menu" << std::endl;
+                    running = true;
+                    std::cout << "Unknown" << std::endl;
+                    break;
+                }
             }
+
+            for(GameObject* obj : objects)
+                PhysicsEngine::AddGameObject(obj);
+
             lastFrameTime = glfwGetTime();
             // clear PhysicsEngine
         }
 
+
+        // ################### UPDATE ###################
         Camera::setView(glm::lookAt(
             glm::vec3(camera.radius * cos(camera.theta), camera.height, camera.radius * sin(camera.theta)),
             camera.target,
@@ -244,7 +269,7 @@ void Demo::Draw()
     // ################### PHYSICS ###################
     double deltaTime = glfwGetTime() - lastFrameTime;
     lastFrameTime = glfwGetTime();
-    if(context.running)
+    if(running)
     {
         lastContacts.clear();
         PhysicsEngine::Update(deltaTime);
@@ -256,14 +281,15 @@ void Demo::Draw()
     }
 
     // ################## GRAPHICS ###################
-    context.obj1->drawable->SetPosition(context.obj1->rb->GetPosition());
-    context.obj1->drawable->SetRotation(context.obj1->rb->GetRotation());
-    context.obj1->drawable->Draw();
+    for(GameObject* obj : objects)
+    {
+        obj->drawable->SetPosition(obj->rb->GetPosition());
+        obj->drawable->SetRotation(obj->rb->GetRotation());
+        obj->drawable->Draw();
+    }
 
-    context.obj2->drawable->SetPosition(context.obj2->rb->GetPosition());
-    context.obj2->drawable->SetRotation(context.obj2->rb->GetRotation());
-    context.obj2->drawable->Draw();
 #ifdef OCTREE_DEBUG
-    PhysicsEngine::DrawOctree();
+    if(showOctree)
+        PhysicsEngine::DrawOctree();
 #endif
 }

@@ -86,7 +86,7 @@ ObjMesh::ObjMesh(GLuint program, const std::string& fileName)
             else
             {
                 // Ignore other kind of data
-                std::cout << "Ignoring line: " << line << std::endl;
+                //std::cout << "Ignoring line: " << line << std::endl;
             }
 
         }

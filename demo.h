@@ -19,14 +19,13 @@ class Demo
     enum class DemoState {
         MENU,
         SPHERE_SPHERE,
-        BOX_PLANE
+        BOX_PLANE,
+        OCTREE
     };
 
-    struct {
-        GameObject* obj1;
-        GameObject* obj2;
-        bool running;
-    } context;
+    bool running;
+    bool showOctree;
+    std::vector<GameObject*> objects;
 
     // Cilinder coordinates
     struct CameraData {
@@ -43,7 +42,7 @@ class Demo
     void ImguiMenu();
     void ImguiDemo();
 
-    void ClearContext();
+    void ClearObjects();
     GameObject* CreateObject(const Vector3D& position, Primitive::Type type);
     void Draw();
 

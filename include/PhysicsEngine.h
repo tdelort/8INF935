@@ -166,7 +166,7 @@ void PhysicsEngine::ResolveCollisionsParticles(float dt)
 
 void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
 {
-    instance().octree = OcTree(Vector3D(0, 0, 0), Vector3D(3, 3, 3));
+    instance().octree = OcTree(Vector3D(0, 0, 0), Vector3D(10, 10, 10));
 
     for(auto& obj : instance().gameObjects)
         instance().octree.Insert(obj->collider);

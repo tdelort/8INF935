@@ -36,7 +36,7 @@ void CollisionDetector::SphereAndSphere(const Sphere& one, const Sphere& two, st
 
 void CollisionDetector::BoxAndPlane(const Box& box, const Plane& plane, std::vector<Contact*>* contacts)
 {
-	Vector3D localCenter = Vector3D(0,0,0);
+	Vector3D localCenter = box.offset.GetPosition();
 
 	// Get all 8 vertex in worldspace
 	// Then try to find if each vertex collides with the plane
@@ -44,8 +44,6 @@ void CollisionDetector::BoxAndPlane(const Box& box, const Plane& plane, std::vec
 	{
 		Vector3D v = localCenter + Vector3D(box.halfSize.x() * (m & 1 ? 1 : -1), box.halfSize.y() * (m & 2 ? 1 : -1), box.halfSize.z() * (m & 4 ? 1 : -1));
 		v = box.rb->WorldPosition(v);
-
-		Vector3D tmp = box.rb->GetRotation();
 
 		float d = v.dot(plane.normal) + plane.distance;
 		if(d <= 0)
