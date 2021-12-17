@@ -20,6 +20,7 @@ class Demo
         MENU,
         SPHERE_SPHERE,
         BOX_PLANE,
+        SPHERE_PLANE,
         OCTREE
     };
 

@@ -85,6 +85,12 @@ class CollisionDetector
 		std::vector<Contact*>* contacts
 	);
 
+	static void SphereAndPlane(
+		const Sphere& sphere,
+		const Plane& plane,
+		std::vector<Contact*>* contacts
+	);
+
 	public:
 
 	static void generateContacts(

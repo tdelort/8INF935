@@ -74,6 +74,9 @@ void Demo::ImguiMenu()
     if (ImGui::Button("Box Plane"))
         demoState = DemoState::BOX_PLANE;
     ImGui::SameLine();
+    if (ImGui::Button("Sphere Plane"))
+        demoState = DemoState::SPHERE_PLANE;
+    ImGui::SameLine();
     if (ImGui::Button("Octree"))
         demoState = DemoState::OCTREE;
     ImGui::End();
@@ -209,6 +212,15 @@ void Demo::run()
                     std::cout << "Box Plane" << std::endl;
                     objects.push_back(CreateObject(Vector3D(1, -1, 0), Primitive::Type::PLANE));
                     GameObject* obj = CreateObject(Vector3D(0.5, 1, 0), Primitive::Type::BOX);
+                    PhysicsEngine::AddRigidBodyForceGenerator(obj->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
+                    objects.push_back(obj);
+                    break;
+                }
+                case DemoState::SPHERE_PLANE:
+                {
+                    std::cout << "Sphere Plane" << std::endl;
+                    objects.push_back(CreateObject(Vector3D(1, -1, 0), Primitive::Type::PLANE));
+                    GameObject* obj = CreateObject(Vector3D(0.5, 1, 0), Primitive::Type::SPHERE);
                     PhysicsEngine::AddRigidBodyForceGenerator(obj->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
                     objects.push_back(obj);
                     break;

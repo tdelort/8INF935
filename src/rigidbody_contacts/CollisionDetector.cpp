@@ -60,6 +60,25 @@ void CollisionDetector::BoxAndPlane(const Box& box, const Plane& plane, std::vec
 	}
 }
 
+void CollisionDetector::SphereAndPlane(const Sphere& sphere, const Plane& plane, std::vector<Contact*>* contacts)
+{
+	Vector3D c = sphere.GetCenter();
+
+	float d = c.dot(plane.normal) + plane.distance - sphere.radius;
+	if(d <= 0)
+	{
+		Contact* contact = new Contact(
+			plane.normal,
+			c - plane.normal * sphere.radius,
+			-d,
+			sphere.rb,
+			nullptr
+		);
+		contacts->push_back(contact);
+	}
+}
+
+
 void CollisionDetector::generateContacts(const Primitive& one, const Primitive& two, std::vector<Contact*>* contacts)
 {
 	// SPHERE SPHERE
@@ -75,6 +94,14 @@ void CollisionDetector::generateContacts(const Primitive& one, const Primitive& 
 	else if (one.GetType() == Primitive::Type::PLANE && two.GetType() == Primitive::Type::BOX)
 	{
 		BoxAndPlane(static_cast<const Box&>(two), static_cast<const Plane&>(one), contacts);
+	}
+	else if (one.GetType() == Primitive::Type::SPHERE && two.GetType() == Primitive::Type::PLANE)
+	{
+		SphereAndPlane(static_cast<const Sphere&>(one), static_cast<const Plane&>(two), contacts);
+	}
+	else if (one.GetType() == Primitive::Type::PLANE && two.GetType() == Primitive::Type::SPHERE)
+	{
+		SphereAndPlane(static_cast<const Sphere&>(two), static_cast<const Plane&>(one), contacts);
 	}
 	else
 	{
