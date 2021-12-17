@@ -22,6 +22,8 @@ public:
 
     Vector3D Euler() const;
 
+    static Quaternion AngleTo(const Vector3D& from, const Vector3D& to);
+
     // x y z w getters
     float x() const;
     float y() const;

@@ -80,7 +80,7 @@ void Matrix3x4::SetOrientationAndPosition(const Quaternion& q, const Vector3D& p
     rot.SetOrientation(q);
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
-            m_data[i * m_m + j] = rot(i, j);
+            m_data[i * m_m + j] = rot(j, i);
 
     m_data[3] = p.x();
     m_data[7] = p.y();

@@ -12,6 +12,8 @@
 
 #include <glm/glm.hpp>
 
+#include <vector>
+
 class Demo
 {
     enum class DemoState {
@@ -46,7 +48,7 @@ class Demo
     void Draw();
 
     void OnCollision(Contact* data);
-    Contact* lastContact = nullptr;
+    std::vector<Contact*> lastContacts;
 public:
     Demo();
     void run();

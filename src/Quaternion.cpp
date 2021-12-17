@@ -60,14 +60,32 @@ void Quaternion::UpdateByAngularVelocity(const Vector3D& rotation, float duratio
 }
 
 Vector3D Quaternion::Euler() const
-{
+{   
     Vector3D result;
-    result.setX(atan2(2 * (w() * x() + y() * z()), 1 - 2 * (x() * x() + y() * y())));
-    //added this to fix some bugs
-    float tmp = w() * y() - z() * x();
-    //tmp = tmp > 0.5f ? 0.5f : tmp;
-    result.setY(asin(2 * (tmp)));
-    result.setZ(atan2(2 * (w() * z() + x() * y()), 1 - 2 * (y() * y() + z() * z())));
+    result.setX(atan2(2.0f * (w() * x() + y() * z()), 1.0f - 2.0f * (x() * x() + y() * y())));
+    result.setY(asin(2.0f * (w() * y() - z() * x())));
+    result.setZ(atan2(2.0f * (w() * z() + x() * y()), 1.0f - 2.0f * (y() * y() + z() * z())));
+    return result;
+}
+
+Quaternion Quaternion::AngleTo(const Vector3D& from, const Vector3D& to)
+{
+    Vector3D a = from.normalize();
+    Vector3D b = to.normalize();
+    
+    float d = a.dot(b);
+    if(d > 0.99)
+        return Quaternion(1, 0, 0, 0);
+    if(d < -0.99)
+        return Quaternion(0, 0, 1, 0);
+
+    Vector3D c = Vector3D::cross(a, b);
+    Quaternion result;
+    result.x() = c.x();
+    result.y() = c.y();
+    result.z() = c.z();
+    result.w() = 1 + d;
+    result.Normalize();
     return result;
 }
 

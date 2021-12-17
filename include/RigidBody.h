@@ -11,7 +11,7 @@ struct Contact;
 
 class RigidBody
 {
-    private:
+    public:
     float m_invMass;
     float m_damping;
     float m_angularDamping;

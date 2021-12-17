@@ -48,7 +48,7 @@ void Demo::OnCollision(Contact* data)
 {
     std::cout << "Collision" << std::endl;
     context.running = false;
-    lastContact = data;
+    lastContacts.push_back(data);
 }
 
 void Demo::CameraControls()
@@ -105,7 +105,7 @@ GameObject* Demo::CreateObject(const Vector3D& position, Primitive::Type type)
     {
         case Primitive::Type::SPHERE:
         {
-            ObjMesh* mesh = new ObjMesh(createProgram(false), MeshPath::sphere);
+            ObjMesh* mesh = new ObjMesh(createProgram(true), MeshPath::sphere);
             mesh->SetScale(glm::vec3(1));
             mesh->SetColor(glm::vec3(1.0f));
             drawable = static_cast<IDrawable*>(mesh);
@@ -115,31 +115,26 @@ GameObject* Demo::CreateObject(const Vector3D& position, Primitive::Type type)
         case Primitive::Type::PLANE:
         {
             Cube* cube = new Cube(createProgram(false));
-            cube->SetScale(glm::vec3(0.1f, 10, 10));
+            cube->SetScale(glm::vec3(10, 0.01f, 10));
             cube->SetColor(glm::vec3(1.0f));
             drawable = static_cast<IDrawable*>(cube);
             Vector3D n = -position.normalize();
-            col = new Plane(-position.normalize(), position.norm());
-            if(n != Vector3D(0,1,0) && n != Vector3D(0,-1,0))
-            {
-                float z = std::atan2(n.y(), n.x());
-                float y = std::atan2(n.z(), n.x());
-                float x = 0;
-                glm::mat4 rY = glm::rotate(glm::mat4(1.0f), y, glm::vec3(0.0f, 1.0f, 0.0f));
-                glm::mat4 rZ = glm::rotate(glm::mat4(1.0f), z, glm::vec3(0.0f, 0.0f, 1.0f));
-                glm::mat4 m_R = rZ * rY;
-                glm::quat q = glm::toQuat(m_R);
-                rotation = Quaternion(q.w, q.x, q.y, q.z);
-            }
+            col = new Plane(n, position.norm());
+
+            rotation = Quaternion::AngleTo(Vector3D(0,1,0), n);
 
             break;
         }
         case Primitive::Type::BOX:
         {
             Vector3D size(2, 1, 1.5f);
-            Cube* cube = new Cube(createProgram(false));
+            Cube* cube = new Cube(createProgram(true));
             cube->SetScale(size);
             cube->SetColor(glm::vec3(1.0f));
+
+            Vector3D random = Vector3D(frand(-1, 1), frand(-1, 1), frand(-1, 1));
+            rotation = Quaternion::AngleTo(Vector3D(1,0,0), random);
+
             drawable = static_cast<IDrawable*>(cube);
             col = new Box(size / 2.0f);
         }
@@ -192,7 +187,9 @@ void Demo::run()
             {
                 ClearContext();
                 PhysicsEngine::Clear();
+                lastContacts.clear();
                 std::cout << "Menu" << std::endl;
+                context.running = true;
             }
             else 
             {
@@ -208,7 +205,7 @@ void Demo::run()
                     case DemoState::BOX_PLANE:
                         std::cout << "Box Plane" << std::endl;
                         context.obj1 = CreateObject(Vector3D(1, -1, 0), Primitive::Type::PLANE);
-                        context.obj2 = CreateObject(Vector3D(0, 1, 0), Primitive::Type::BOX);
+                        context.obj2 = CreateObject(Vector3D(0.5, 1, 0), Primitive::Type::BOX);
                         PhysicsEngine::AddRigidBodyForceGenerator(context.obj2->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
                         break;
                     default:
@@ -249,14 +246,13 @@ void Demo::Draw()
     lastFrameTime = glfwGetTime();
     if(context.running)
     {
+        lastContacts.clear();
         PhysicsEngine::Update(deltaTime);
     }
     else
     {
-        if(lastContact != nullptr)
-        {
-            lastContact->Draw();
-        }
+        for(auto c : lastContacts)
+            c->Draw();
     }
 
     // ################## GRAPHICS ###################

@@ -10,6 +10,7 @@ public:
 
     inline AABB GetAABB() const override
     {
+        //TODO fix
         Vector3D center = GetCenter();
         Vector3D min = center - halfSize;
         Vector3D max = center + halfSize;

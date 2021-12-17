@@ -219,7 +219,9 @@ void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
     }
 }
 
+#ifdef OCTREE_DEBUG
 void PhysicsEngine::DrawOctree()
 {
     instance().octree.Draw();
 }
+#endif

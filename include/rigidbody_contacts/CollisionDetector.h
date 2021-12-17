@@ -47,29 +47,26 @@ struct Contact
 	
 	void Draw()
 	{
-
+		//Contact point
 		ContactDebugging::instance().sphere->SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
 		ContactDebugging::instance().sphere->SetScale(glm::vec3(0.1f));
 		ContactDebugging::instance().sphere->SetPosition(contactPoint);
+		ContactDebugging::instance().sphere->Draw();
 
+		//Contact normal
 		float scale = contactNormal.norm();
 		ContactDebugging::instance().cube->SetColor(glm::vec3(1.0f, 1.0f, 0.0f));
 		ContactDebugging::instance().cube->SetScale(glm::vec3(scale, 0.05f, 0.05f));
 		ContactDebugging::instance().cube->SetPosition(contactPoint + contactNormal * 0.5f);
-		float z = std::atan2(contactNormal.y(), contactNormal.x());
-		float y = std::atan2(contactNormal.z(), contactNormal.x());
-		float x = 0;
-		ContactDebugging::instance().cube->SetRotation(glm::vec3(x, y, z));
-
-		ContactDebugging::instance().sphere->Draw();
+		Quaternion rot = Quaternion::AngleTo(Vector3D(1, 0, 0), contactNormal);
+		ContactDebugging::instance().cube->SetRotation(rot.Euler());
 		ContactDebugging::instance().cube->Draw();
 
-		//scale = interpenetration;
-		//ContactDebugging::instance().cube->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
-		//ContactDebugging::instance().cube->SetScale(glm::vec3(scale, 0.03f, 0.03f));
-		//ContactDebugging::instance().cube->SetPosition(contactPoint + contactNormal * 0.5f * interpenetration);
-		//ContactDebugging::instance().cube->SetRotation(glm::vec3(x, y, z));
-		//ContactDebugging::instance().cube->Draw();
+		//Interpenetration
+		ContactDebugging::instance().cube->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
+		ContactDebugging::instance().cube->SetScale(glm::vec3(interpenetration, 0.03f, 0.03f));
+		ContactDebugging::instance().cube->SetPosition(contactPoint + contactNormal * 0.5f * interpenetration);
+		ContactDebugging::instance().cube->Draw();
 	}
 
 };
