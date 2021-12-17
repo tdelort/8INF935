@@ -18,6 +18,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 // STD Lib
 #include <iostream>
@@ -46,7 +47,7 @@ inline float frand(int lo, int hi)
 void Demo::OnCollision(Contact* data)
 {
     std::cout << "Collision" << std::endl;
-    context.sampleDemo.running = false;
+    context.running = false;
     lastContact = data;
 }
 
@@ -57,75 +58,104 @@ void Demo::CameraControls()
     ImGui::SliderFloat("Camera height", &camera.height, -5, 5);
     ImGui::SliderFloat("Camera radius", &camera.radius, 1, 10);
 
-    if (demoState == DemoState::SAMPLE_DEMO)
-    {   
-        ImGui::Checkbox("Follow Mesh", &camera.follow);
-        if (camera.follow)
-        {
-            camera.target.x = context.sampleDemo.sphere1->rb->GetPosition().x();
-            camera.target.y = context.sampleDemo.sphere1->rb->GetPosition().y();
-            camera.target.z = context.sampleDemo.sphere1->rb->GetPosition().z();
-        }
-        else
-        {
-            ImGui::SliderFloat("Target x", &camera.target.x, -10, 10);
-            ImGui::SliderFloat("Target y", &camera.target.y, -10, 10);
-            ImGui::SliderFloat("Target z", &camera.target.z, -10, 10);
-        }
-    }
-    else // DemoState::MENU
-    {
-        ImGui::SliderFloat("Target x", &camera.target.x, -10, 10);
-        ImGui::SliderFloat("Target y", &camera.target.y, -10, 10);
-        ImGui::SliderFloat("Target z", &camera.target.z, -10, 10);
-    }
+    ImGui::SliderFloat("Target x", &camera.target.x, -10, 10);
+    ImGui::SliderFloat("Target y", &camera.target.y, -10, 10);
+    ImGui::SliderFloat("Target z", &camera.target.z, -10, 10);
 }
 
 void Demo::ImguiMenu()
 {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-
-    ImGui::NewFrame();
     ImGui::Begin("Main Menu", 0, ImGuiWindowFlags_AlwaysAutoResize);
     CameraControls();
     ImGui::Text("Choose the demo");
-    if (ImGui::Button("Sample Demo"))
-        demoState = DemoState::SAMPLE_DEMO;
+    if (ImGui::Button("Sphere Sphere"))
+        demoState = DemoState::SPHERE_SPHERE;
+    ImGui::SameLine();
+    if (ImGui::Button("Box Plane"))
+        demoState = DemoState::BOX_PLANE;
     ImGui::End();
 }
 
-void Demo::ImguiSampleDemo()
+void Demo::ImguiDemo()
 {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-
-    ImGui::NewFrame();
-    ImGui::Begin("Sample Demo", 0, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("Sphere Sphere", 0, ImGuiWindowFlags_AlwaysAutoResize);
     CameraControls();
     if (ImGui::Button("Back"))
         demoState = DemoState::MENU;
-    ImGui::Checkbox("Running", &context.sampleDemo.running);
+    ImGui::Checkbox("Running", &context.running);
     ImGui::End();
 }
 
-void Demo::ClearContext(DemoState oldState)
+void Demo::ClearContext()
 {
-    switch (oldState)
+    delete context.obj1->rb;
+    delete context.obj1->drawable;
+    delete context.obj1->collider;
+    delete context.obj2->rb;
+    delete context.obj2->drawable;
+    delete context.obj2->collider;
+}
+
+GameObject* Demo::CreateObject(const Vector3D& position, Primitive::Type type)
+{   
+    Quaternion rotation(1, 0, 0, 0);
+    IDrawable* drawable; 
+    Primitive* col;
+    switch(type)
     {
-    case DemoState::SAMPLE_DEMO:
-        delete context.sampleDemo.sphere1;
-        delete context.sampleDemo.sphere2;
-        break;
-    default:
-        break;
+        case Primitive::Type::SPHERE:
+        {
+            ObjMesh* mesh = new ObjMesh(createProgram(false), MeshPath::sphere);
+            mesh->SetScale(glm::vec3(1));
+            mesh->SetColor(glm::vec3(1.0f));
+            drawable = static_cast<IDrawable*>(mesh);
+            col = new Sphere(0.5f);
+            break;
+        }
+        case Primitive::Type::PLANE:
+        {
+            Cube* cube = new Cube(createProgram(false));
+            cube->SetScale(glm::vec3(0.1f, 10, 10));
+            cube->SetColor(glm::vec3(1.0f));
+            drawable = static_cast<IDrawable*>(cube);
+            Vector3D n = -position.normalize();
+            col = new Plane(-position.normalize(), position.norm());
+            if(n != Vector3D(0,1,0) && n != Vector3D(0,-1,0))
+            {
+                float z = std::atan2(n.y(), n.x());
+                float y = std::atan2(n.z(), n.x());
+                float x = 0;
+                glm::mat4 rY = glm::rotate(glm::mat4(1.0f), y, glm::vec3(0.0f, 1.0f, 0.0f));
+                glm::mat4 rZ = glm::rotate(glm::mat4(1.0f), z, glm::vec3(0.0f, 0.0f, 1.0f));
+                glm::mat4 m_R = rZ * rY;
+                glm::quat q = glm::toQuat(m_R);
+                rotation = Quaternion(q.w, q.x, q.y, q.z);
+            }
+
+            break;
+        }
+        case Primitive::Type::BOX:
+        {
+            Vector3D size(2, 1, 1.5f);
+            Cube* cube = new Cube(createProgram(false));
+            cube->SetScale(size);
+            cube->SetColor(glm::vec3(1.0f));
+            drawable = static_cast<IDrawable*>(cube);
+            col = new Box(size / 2.0f);
+        }
     }
+
+    RigidBody* rb = new RigidBody(position, rotation, 1.0f, 0.99f, 0.99f, {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}});
+    rb->onCollision = [this](Contact* contact){ OnCollision(contact); };
+
+    col->offset = Matrix3x4::Identity();
+    col->rb = rb;
+
+    return new GameObject(rb, col, drawable);
 }
 
 Demo::Demo()
-{
-
-}
+{ }
 
 void Demo::run()
 {
@@ -136,16 +166,21 @@ void Demo::run()
     camera = {3.14 * 0.5, 5.0, 2.5, glm::vec3(0.0, 0.0, 0.0), false};
     lastFrameTime = glfwGetTime();
 
+    DemoState oldState = demoState;
 	while(gui->isOpen())
     {
         gui->pollEvents();
+        gui->clear(clear_color);
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
 
         // ################### IMGUI ###################
-        DemoState oldState = demoState;
+        oldState = demoState;
         switch(demoState)
         {
             case DemoState::MENU: ImguiMenu(); break;
-            case DemoState::SAMPLE_DEMO: ImguiSampleDemo(); break;
+            default: ImguiDemo(); break;
         }
 
         // ################# TRANSITIONS #################
@@ -153,61 +188,41 @@ void Demo::run()
         {
             std::cout << "Transition to : ";
 
-            ClearContext(oldState);
-            PhysicsEngine::Clear();
-
             if (demoState == DemoState::MENU)
             {
+                ClearContext();
+                PhysicsEngine::Clear();
                 std::cout << "Menu" << std::endl;
             }
-            else if (demoState == DemoState::SAMPLE_DEMO)
+            else 
             {
-                std::cout << "Sample Demo" << std::endl;
+                // Demo initialization
+                switch(demoState)
+                {
+                    case DemoState::SPHERE_SPHERE:
+                        std::cout << "Sphere Sphere" << std::endl;
+                        context.obj1 = CreateObject(Vector3D(0, 0, 0), Primitive::Type::SPHERE);
+                        context.obj2 = CreateObject(Vector3D(0.5, 3, 0.5), Primitive::Type::SPHERE);
+                        PhysicsEngine::AddRigidBodyForceGenerator(context.obj2->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
+                        break;
+                    case DemoState::BOX_PLANE:
+                        std::cout << "Box Plane" << std::endl;
+                        context.obj1 = CreateObject(Vector3D(1, -1, 0), Primitive::Type::PLANE);
+                        context.obj2 = CreateObject(Vector3D(0, 1, 0), Primitive::Type::BOX);
+                        PhysicsEngine::AddRigidBodyForceGenerator(context.obj2->rb, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
+                        break;
+                    default:
+                        std::cout << "Unknown" << std::endl;
+                        break;
+                }
 
-                RigidBody* rb1 = new RigidBody(
-                    Vector3D(0.5, 5, 0),
-                    Quaternion(1, 0, 0, 0),
-                    1.0f, 0.99f, 0.99f,
-                    {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
-                );
-                rb1->onCollision = [this](Contact* contact){ OnCollision(contact); };
-
-                ObjMesh* mesh1 = new ObjMesh(createProgram(true), MeshPath::sphere);
-                mesh1->SetScale(glm::vec3(1));
-                mesh1->SetColor(glm::vec3(1.0f));
-
-                Primitive* col1 = new Sphere(0.5f);
-                col1->offset = Matrix3x4::Identity();
-                col1->rb = rb1;
-
-                context.sampleDemo.sphere1 = new GameObject(rb1, col1, mesh1);
-
-                RigidBody* rb2 = new RigidBody(
-                    Vector3D(0, 0, 0),
-                    Quaternion(1, 0, 0, 0),
-                    1.0f, 0.99f, 0.99f,
-                    {{2, 0, 0}, {0, 2, 0}, {0, 0, 2}}
-                );
-
-                ObjMesh* mesh2 = new ObjMesh(createProgram(true), MeshPath::sphere);
-                mesh2->SetScale(glm::vec3(1));
-                mesh2->SetColor(glm::vec3(1.0f));
-
-                Primitive* col2 = new Sphere(0.5f);
-                col2->offset = Matrix3x4::Identity();
-                col2->rb = rb2;
-
-                context.sampleDemo.sphere2 = new GameObject(rb2, col2, mesh2);
-
-                PhysicsEngine::AddGameObject(context.sampleDemo.sphere1);
-                PhysicsEngine::AddGameObject(context.sampleDemo.sphere2);
-                PhysicsEngine::AddRigidBodyForceGenerator(rb1, new GravityForceGenerator(Vector3D(0, -9.81, 0)));
+                PhysicsEngine::AddGameObject(context.obj1);
+                PhysicsEngine::AddGameObject(context.obj2);
             }
             lastFrameTime = glfwGetTime();
             // clear PhysicsEngine
         }
 
-        gui->clear(clear_color);
         Camera::setView(glm::lookAt(
             glm::vec3(camera.radius * cos(camera.theta), camera.height, camera.radius * sin(camera.theta)),
             camera.target,
@@ -218,20 +233,21 @@ void Demo::run()
         glfwGetWindowSize(gui->GetWindow(), &width, &height);
         Camera::setProj(glm::perspective(glm::radians(45.0f), (float)width / (float)height, 1.0f, 100.0f));
 
-        if (demoState == DemoState::SAMPLE_DEMO)
-            SampleDemo();
+        if(demoState != DemoState::MENU)
+            Draw();
 
         grid.Draw();
+
         gui->swapBuffers();
     }
 }
 
-void Demo::SampleDemo()
+void Demo::Draw()
 {
     // ################### PHYSICS ###################
     double deltaTime = glfwGetTime() - lastFrameTime;
     lastFrameTime = glfwGetTime();
-    if(context.sampleDemo.running)
+    if(context.running)
     {
         PhysicsEngine::Update(deltaTime);
     }
@@ -244,13 +260,13 @@ void Demo::SampleDemo()
     }
 
     // ################## GRAPHICS ###################
-    context.sampleDemo.sphere1->drawable->SetPosition(context.sampleDemo.sphere1->rb->GetPosition());
-    context.sampleDemo.sphere1->drawable->SetRotation(context.sampleDemo.sphere1->rb->GetRotation());
-    context.sampleDemo.sphere1->drawable->Draw();
+    context.obj1->drawable->SetPosition(context.obj1->rb->GetPosition());
+    context.obj1->drawable->SetRotation(context.obj1->rb->GetRotation());
+    context.obj1->drawable->Draw();
 
-    context.sampleDemo.sphere2->drawable->SetPosition(context.sampleDemo.sphere2->rb->GetPosition());
-    context.sampleDemo.sphere2->drawable->SetRotation(context.sampleDemo.sphere2->rb->GetRotation());
-    context.sampleDemo.sphere2->drawable->Draw();
+    context.obj2->drawable->SetPosition(context.obj2->rb->GetPosition());
+    context.obj2->drawable->SetRotation(context.obj2->rb->GetRotation());
+    context.obj2->drawable->Draw();
 #ifdef OCTREE_DEBUG
     PhysicsEngine::DrawOctree();
 #endif

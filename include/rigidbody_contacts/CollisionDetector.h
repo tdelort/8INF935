@@ -2,6 +2,7 @@
 
 #include "colliders/Sphere.h"
 #include "colliders/Box.h"
+#include "colliders/Plane.h"
 #include "colliders/Primitive.h"
 
 #include "../ObjMesh.h"
@@ -62,6 +63,13 @@ struct Contact
 
 		ContactDebugging::instance().sphere->Draw();
 		ContactDebugging::instance().cube->Draw();
+
+		//scale = interpenetration;
+		//ContactDebugging::instance().cube->SetColor(glm::vec3(0.0f, 1.0f, 0.0f));
+		//ContactDebugging::instance().cube->SetScale(glm::vec3(scale, 0.03f, 0.03f));
+		//ContactDebugging::instance().cube->SetPosition(contactPoint + contactNormal * 0.5f * interpenetration);
+		//ContactDebugging::instance().cube->SetRotation(glm::vec3(x, y, z));
+		//ContactDebugging::instance().cube->Draw();
 	}
 
 };
@@ -71,6 +79,12 @@ class CollisionDetector
 	static void SphereAndSphere(
 		const Sphere& one,
 		const Sphere& two,
+		std::vector<Contact*>* contacts
+	);
+
+	static void BoxAndPlane(
+		const Box& box,
+		const Plane& plane,
 		std::vector<Contact*>* contacts
 	);
 

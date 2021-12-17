@@ -16,15 +16,14 @@ class Demo
 {
     enum class DemoState {
         MENU,
-        SAMPLE_DEMO,
+        SPHERE_SPHERE,
+        BOX_PLANE
     };
 
-    union DemoContext {
-        struct {
-            GameObject* sphere1;
-            GameObject* sphere2;
-            bool running;
-        } sampleDemo;
+    struct {
+        GameObject* obj1;
+        GameObject* obj2;
+        bool running;
     } context;
 
     // Cilinder coordinates
@@ -40,15 +39,11 @@ class Demo
 
     void CameraControls();
     void ImguiMenu();
-    void ImguiSampleDemo();
-    void ImguiCollisionDemo();
-    void ImguiSpringDemo();
+    void ImguiDemo();
 
-    void ClearContext(DemoState oldState);
-
-    void SampleDemo();
-    void CollisionDemo();
-    void SpringDemo();
+    void ClearContext();
+    GameObject* CreateObject(const Vector3D& position, Primitive::Type type);
+    void Draw();
 
     void OnCollision(Contact* data);
     Contact* lastContact = nullptr;

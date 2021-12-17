@@ -211,8 +211,10 @@ void PhysicsEngine::ResolveCollisionsRigidBodies(float dt)
     {
         for(auto& contact : rigidBodyContacts)
         {
-            contact->rigidbodies[0]->onCollision(contact);
-            contact->rigidbodies[1]->onCollision(contact);
+            if(contact->rigidbodies[0] != nullptr)
+                contact->rigidbodies[0]->onCollision(contact);
+            if(contact->rigidbodies[1] != nullptr)
+                contact->rigidbodies[1]->onCollision(contact);
         }
     }
 }

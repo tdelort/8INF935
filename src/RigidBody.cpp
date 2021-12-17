@@ -73,6 +73,12 @@ Vector3D RigidBody::GetRotation() const
     return m_orientation.Euler();
 }
 
+void RigidBody::SetRotation(const Quaternion& rotation)
+{
+    m_orientation = rotation;
+    CalculateDerivedData();
+}
+
 float RigidBody::GetInvMass() const
 {
     return m_invMass;

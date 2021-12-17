@@ -19,4 +19,6 @@ public:
     {
         return Type::PLANE;
     }
+
+    Plane(Vector3D normal, float distance) : normal(normal), distance(distance) {}
 };

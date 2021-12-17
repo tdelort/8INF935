@@ -51,6 +51,8 @@ class RigidBody
 
     Vector3D GetRotation() const;
 
+    void SetRotation(const Quaternion& rotation);
+    
     float GetInvMass() const;
 
     Vector3D WorldPosition(const Vector3D& local);

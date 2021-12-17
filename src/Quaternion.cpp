@@ -63,7 +63,10 @@ Vector3D Quaternion::Euler() const
 {
     Vector3D result;
     result.setX(atan2(2 * (w() * x() + y() * z()), 1 - 2 * (x() * x() + y() * y())));
-    result.setY(asin(2 * (w() * y() - z() * x())));
+    //added this to fix some bugs
+    float tmp = w() * y() - z() * x();
+    //tmp = tmp > 0.5f ? 0.5f : tmp;
+    result.setY(asin(2 * (tmp)));
     result.setZ(atan2(2 * (w() * z() + x() * y()), 1 - 2 * (y() * y() + z() * z())));
     return result;
 }

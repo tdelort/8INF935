@@ -74,7 +74,7 @@ static const char* fragmentSource = R"glsl(
         float intensity = max(dot(normalize(gs_normal), normalize(lightPos - gs_fragPos)), 0.0);
         vec3 diffuse = lightColor * intensity; 
         vec3 ambient = lightColor * 0.1;
-		outColor = vec4((diffuse + ambient) * albedo, 1.0);
+		outColor = vec4((diffuse + ambient) * albedo, 0.7);
         //outColor = vec4(gs_normal, 1.0);
 	}
 )glsl";

@@ -23,4 +23,6 @@ public:
     {
         return Type::BOX;
     }
+
+    Box(Vector3D halfSize) : halfSize(halfSize) {}
 };
