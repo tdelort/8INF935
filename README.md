@@ -13,7 +13,7 @@ mkdir build && cd build
 cmake ..
 cmake --build .
 cd Debug/
-./PhysicsEngineTests.exe ../../teapot.obj
+./PhysicsEngineTests.exe
 ```
 
 ## Bibliothèque externes
